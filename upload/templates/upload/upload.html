@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Upload{% endblock title %}
+
+{% block style %}
+	<style>
+	</style>
+{% endblock style %}
+
+{% block content %}
+	<div class="panel panel-defualt">
+		<div class="panel-heading">Upload a Track</div>
+		<div class="panel-body">
+			<div id="filetype_alert" class="alert alert-warning fade in" hidden>
+				<strong>Please upload .wav, .mp3, or .ogg file</strong>
+			</div>
+			<div id="filesize_alert" class="alert alert-warning fade in" hidden>
+				<strong>Please upload a file with size less than 10MiB</strong>
+			</div>
+			<div id="fileok_info" class="alert alert-success fade in" hidden>
+				<strong>Press "Submit" to continue</strong>
+			</div>
+
+			<form role="form" enctype="multipart/form-data" method="post">
+				<div class="form-group">
+					<input type="file" id="file" name="TRACK">
+				</div>
+				<input type="submit" name="SUBMIT" id="submit_button" class="btn btn-default" value="SUBMIT">
+			</form>
+		</div>
+	</div>
+{% endblock content %}
+
+{% block script %}
+<script>
+	var is_file_valid = false;
+	//file validation
+	$('#file').change(function(){
+		var file = this.files[0];
+		var name =  file.name;
+		var size = file.size;
+		var type = file.type;
+		console.log(name, size, type)
+
+		//close all alerts
+		$('.alert').trigger('alert:off');
+
+
+		//if not an audio file, show alert
+		if(!type.match(/^audio/)){
+			console.log("file type invalid");
+			$('#filetype_alert').trigger('alert:on');
+		}
+		//if file is too large, show alert
+		else if(size>10*1024*1024){
+			console.log("file too large");
+			$('#filesize_alert').trigger('alert:on');
+		}
+		//file is suitable
+		else{
+			$('#fileok_info').trigger('alert:on');
+		}
+
+	});
+	//alert message event handler
+	$('.alert').on('alert:on', function(){
+		$(this).slideDown();
+	});
+	$('.alert').on('alert:off', function(){
+		$(this).hide();
+	});
+
+</script>
+
+{% endblock script %}

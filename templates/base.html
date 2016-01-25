@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{% block title %}Pulse Code{% endblock title %}</title>
+
+{% load static %}
+	<link href="{% static "bootstrap3.3.6/css/bootstrap.min.css" %}" rel="stylesheet">
+	
+	<!--[if It IE 9]>
+		<script src="{% static "html5shiv/html5shiv.js" %}"></script>
+		<script src="{% static "respond/respond.min.js" %}"></script>
+	<![endif]-->
+	<link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet' type='text/css'>
+	<style>
+		body {
+			background-color: #111111;
+			font-family: 'Quicksand', sans-serif;
+			color: #dddddd;
+		}
+		.panel-heading{
+			background-color: #333333;
+			color: #ffffff;
+		}
+		.panel-body{
+			background-color: #111111;
+		}
+		.panel{
+			border: 1px solid #333333;
+			-webkit-box-shadow: 0 3px 3px rgba(255, 255, 255, 0.1);
+			-mozilla-box-shadow: 0 3px 3px rgba(255, 255, 255, 0.1);
+			box-shadow: 0 3px 3px rgba(255, 255, 255, 0.1);
+		}
+		.btn-default{
+			background-color: #333333;
+			color: #ffffff;
+			border: 0px;
+		}
+		.btn-default:hover{
+			background-color: #dddddd;
+			color: #111111;
+			border: 0px;
+		}
+		.alert-warning{
+			background-color: #992222;
+			color: #ffaaaa;
+			border-color: #dddddd;
+		}
+		.alert-success{
+			border-color: #000000;
+		}
+	</style>
+	{% block style %}
+	{% endblock style %}
+</head>
+<body>
+	{% block content %}
+	{% endblock content %}
+
+	<script src="{% static "jquery2.2.0/jquery-2.2.0.min.js" %}"></script>
+	<script src="{% static "bootstrap3.3.6/js/bootstrap.min.js" %}"></script>
+	{% block script %}
+	{% endblock script %}
+</body>
+
+</html>
+

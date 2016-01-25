@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %} Login {% endblock title %}
+
+{% block style %}
+<style>
+	a.titlelogo {
+		color: #004c99;
+	}
+	a.titlelogo:hover {
+		text-decoration: none;
+	}
+	h4.titlelogo {
+		color: #dddddd;
+	}
+	.asteriskField {
+		visibility: hidden;
+	}
+	#div_id_remember_me {
+		margin-left: 18px;
+	}
+</style>
+{% endblock style %}
+
+
+
+{% block content %}
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<h1>
+				<a class="titlelogo" href="/" title="PulseCode Home" tabindex="3">PulseCode</a>
+			</h1>
+			<h4 class="titlelogo">a computer music community in POSTECH</h4>
+			<!--error message-->
+			<div id="login_alert" class="alert alert-warning" hidden></div>
+
+			<!--login form-->
+			{% load crispy_forms_tags %}
+			{% crispy form %}
+
+		</div>
+	</div><!--end logindiv-->
+{% endblock content %}
+
+{% block script %}
+<script>
+	/*$('#submit_button').on('click', function(e){
+		e.preventDefault();
+		var request = new XMLHttpRequest();
+		request.open('GET', {% url 'login:login' %}, false);
+
+		request.send();
+
+		alert(request.responseText);
+	});*/
+	function getCookie(c_name)
+	{
+		if(document.cookie.length >0){
+			c_start = document.cookie.indexOf(c_name + "=");
+			if(c_start != -1){
+				c_start = c_start + c_name.length + 1;
+				c_end = document.cookie.indexOf(";", c_start);
+				if(c_end == -1) c_end = document.cookie.length;
+				return unescape(document.cookie.substring(c_start, c_end));
+			}
+		}
+		return "";
+	}
+	$(function(){
+		$.ajaxSetup({
+			headers: {'X-CSRFToken': getCookie("csrftoken")}
+		});
+		$('#login_form').on('submit', function(e){
+			e.preventDefault();
+			$.ajax({
+				type: "POST",
+				url: '{% url 'login:login' %}',
+				data: {
+					'username': $('#user_id').val(),
+					'password': $('#user_pass').val(),
+					'remember_me': $('#rememberme').val()
+				},
+				success: function(data){
+					//if success, redirect to home
+					if(data.success == true)
+						document.location.replace('../upload/');
+					else
+						$('#login_alert').html('<strong>'+data.message+'</strong>').slideDown();
+				},
+				failure: function(data){
+					console.log('failure', data);
+				}
+			});
+			return false;
+		});
+	});
+</script>
+{% endblock script %}
+
+
