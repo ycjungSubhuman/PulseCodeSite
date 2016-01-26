@@ -20,13 +20,9 @@
 			<div id="fileok_info" class="alert alert-success fade in" hidden>
 				<strong>Press "Submit" to continue</strong>
 			</div>
-
-			<form role="form" enctype="multipart/form-data" method="post">
-				<div class="form-group">
-					<input type="file" id="file" name="TRACK">
-				</div>
-				<input type="submit" name="SUBMIT" id="submit_button" class="btn btn-default" value="SUBMIT">
-			</form>
+			<!-- upload form -->
+			{% load crispy_forms_tags %}
+			{% crispy form %}
 		</div>
 	</div>
 {% endblock content %}

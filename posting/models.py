@@ -7,6 +7,9 @@ from django.contrib.auth.models import User
 class Tag(models.Model):
 	name = models.CharField(max_length=20)
 
+	def __unicode__(self):
+		return self.name
+
 class Creator(models.Model):
 	name = models.CharField(max_length=12)
 	salutation = models.CharField(max_length=140)
@@ -46,4 +49,3 @@ class Journal(Post):
 	body = models.TextField()
 	bgimage = models.ImageField(upload_to='uploads/bgimage/%Y/%m/%d/')
 	upload = models.ManyToManyField(JournalUpload)
-
