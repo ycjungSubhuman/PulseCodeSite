@@ -13,8 +13,8 @@ built with Django 1.9.1, crispy_forms, bootstrap3.3.6, html5shiv, jquery2.2.0, r
 #Milestones
 * ~~Designing Model~~
 * ~~Ajax Login Form~~
-* Upload Form for track upload
-* implement Form for Journal/tutorial
+* ~~Upload Form for track upload~~
+* ~~implement Form for Journal/tutorial~~
 * implement personal page<--we are here
 * ajax-fy personal page
 * ajax-fy forms
