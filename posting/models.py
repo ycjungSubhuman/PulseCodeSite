@@ -3,6 +3,11 @@ from __future__ import unicode_literals
 from django.db import models
 from upload.models import JournalUpload
 from django.contrib.auth.models import User
+from audiofield.fields import AudioField
+from pulsecode import settings
+from django.utils.html import format_html
+from django_markdown.models import MarkdownField
+import os
 
 class Tag(models.Model):
 	name = models.CharField(max_length=20)
@@ -27,25 +32,31 @@ class Team(Creator):
 	
 class Post(models.Model):
 	title = models.CharField(max_length=40)
-	author = models.OneToOneField(Creator)
+	author = models.ForeignKey(Creator)
 	tag = models.ManyToManyField(Tag)
-	liked_member = models.ManyToManyField(Member, related_name='liked_post')
-	scraped_member = models.ManyToManyField(Member, related_name='scraped_post')
+	liked_member = models.ManyToManyField(Member, related_name='liked_post', blank=True)
+	scraped_member = models.ManyToManyField(Member, related_name='scraped_post', blank=True)
 
 class Track(Post):
 	#data
-	audio = models.FileField(upload_to='uploads/tracks/converted/%Y/%m/%d/')
-	download = models.FileField(upload_to='uploads/tracks/raw/%Y/%m/%d/', 
-		help_text='A track should be smaller than 10MiB')
+	allow_tags = True
+	audio_file = AudioField(upload_to='uploads/tracks/converted/%Y/%m/%d/', ext_whitelist=(".mp3", ".wav", ".ogg"))
 
 	image = models.ImageField(upload_to='uploads/images/%Y/%m/%d', 
 		help_text='Image should be smaller than 2MiB')
 
 	description = models.CharField(max_length=140)
-	playtime = models.IntegerField() #in seconds
 	datetime = models.DateTimeField(auto_now=True)
 
+	def audio_file_player(self):
+	    """audio player tag for admin"""
+	    self.allow_tags
+	    if self.audio_file:
+	        file_url = settings.MEDIA_URL + str(self.audio_file)
+	        player_string = '<ul class="playlist"><li style="width:250px;">\
+	        <a href="%s">%s</a></li></ul>' % (file_url, os.path.basename(self.audio_file.name))
+	        return format_html(player_string)
+
 class Journal(Post):
-	body = models.TextField()
+	body = MarkdownField()
 	bgimage = models.ImageField(upload_to='uploads/bgimage/%Y/%m/%d/')
-	upload = models.ManyToManyField(JournalUpload)

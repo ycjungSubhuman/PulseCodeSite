@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from login.views import user_logout
+from upload.views import JournalWriteView
 
 
 urlpatterns = [
@@ -23,6 +24,8 @@ urlpatterns = [
 	url(r'^login/', include('login.urls', namespace='login')),
 	url(r'^upload/', include('upload.urls', namespace='upload')),
     url(r'^logout/', user_logout, name='logout'),
+    url(r'^write/', JournalWriteView.as_view(), name='write'),
+    url(r'^markdown/', include('django_markdown.urls')),
 #url(r'^register/', include('register.urls', namespace='register')),
 ]
 

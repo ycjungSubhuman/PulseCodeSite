@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Write Journal{% endblock title %}
+
+{% block content %}
+	<div class="panel panel-default">
+		<div class="panel-heading">Write Journal</div>
+		<div class="panel-body">
+			{% load crispy_forms_tags %}
+			{% crispy form %}
+		</div>
+	</div>
+{% endblock content %}
