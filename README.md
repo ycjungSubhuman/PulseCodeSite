@@ -13,9 +13,12 @@ built with Django 1.9.1, crispy_forms, bootstrap3.3.6, html5shiv, jquery2.2.0, r
 #Milestones
 * ~~Designing Model~~
 * ~~Ajax Login Form~~
-* Ajax Upload Form for track upload <-- we are here
+* Upload Form for track upload
 * implement Form for Journal/tutorial
-* implement ajax personal page
-* implement like/scrap
+* implement personal page<--we are here
+* ajax-fy personal page
+* ajax-fy forms
+* polish invalid input feedback
+* implement notifications
 * implement achievement
 * design pollishing
