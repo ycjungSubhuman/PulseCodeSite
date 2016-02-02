@@ -1,18 +1,10 @@
-{% extends "base.html" %}
+{% extends "base_navigator.html" %}
 
 {% block title %} Login {% endblock title %}
 
 {% block style %}
+{{ block.super }}
 <style>
-	a.titlelogo {
-		color: #004c99;
-	}
-	a.titlelogo:hover {
-		text-decoration: none;
-	}
-	h4.titlelogo {
-		color: #dddddd;
-	}
 	.asteriskField {
 		visibility: hidden;
 	}

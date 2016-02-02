@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 	<title>{% block title %}Pulse Code{% endblock title %}</title>
 
 {% load static %}
@@ -15,6 +15,7 @@
 	<link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet' type='text/css'>
 	<style>
 		body {
+			padding: 0;
 			background-color: #111111;
 			font-family: 'Quicksand', sans-serif;
 			color: #dddddd;
@@ -50,13 +51,33 @@
 		.alert-success{
 			border-color: #000000;
 		}
+		a.titlelogo {
+			color: #004c99;
+		}
+		a.titlelogo:hover {
+			text-decoration: none;
+		}
+		h4.titlelogo {
+			color: #dddddd;
+		}
+		html, body {
+		  width: auto !important;
+		  overflow-x: hidden !important;
+		  height: 100%;
+		  margin: 0;
+		  padding: 0;
+		  overflow: hidden;
+		}
+		.top52 {
+			margin-top:52px;
+		}
 	</style>
 	{% block style %}
 	{% endblock style %}
 </head>
 <body>
-	{% block content %}
-	{% endblock content %}
+	{% block body %}
+	{% endblock body %}
 
 	<script src="{% static "jquery2.2.0/jquery-2.2.0.min.js" %}"></script>
 	<script src="{% static "bootstrap3.3.6/js/bootstrap.min.js" %}"></script>
