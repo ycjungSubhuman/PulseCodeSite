@@ -1,1 +1,49 @@
 {% extends "base_sidebar.html" %}
+
+{% block scrollbar %}
+
+{% endblock scrollbar %}
+
+{% block sidebar %}
+{% endblock sidebar %}
+
+
+{% block script %}
+{{ block.super }}
+<script>
+	$(function(){
+		$.ajaxSetup({
+			headers: {'X-CSRFToken': getCookie("csrftoken")}
+		});
+
+		function getResult(){
+			//get where to start
+			var startfrom = $('#start_from').val();
+			var type = $('#type').val();
+			//ajax call
+			$.ajax({
+				type: "POST",
+				url: '{% url "home:home" %}',
+				data: {
+					'isscroll': true,
+					'startfrom': startfrom,
+					'type': type,
+				}
+				success: function(data){
+
+				},
+				failure: function(data){
+
+				},
+			});
+		}
+		$(window).scroll(function(){//scroll loading event
+			//if page reached the bottom
+			if($(window).scrollTop()+$(window).height() >= ($(document).height()-200)){
+				getResult();
+			}
+
+		});
+	});	
+</script>	
+{% endblock script %}

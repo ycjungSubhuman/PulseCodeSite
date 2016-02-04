@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 from django.db import models
 from upload.models import JournalUpload
 from django.contrib.auth.models import User
-from audiofield.fields import AudioField
+from django.dispatch import receiver
 from pulsecode import settings
 from django.utils.html import format_html
 from django_markdown.models import MarkdownField
 import os
+
 
 class Tag(models.Model):
 	name = models.CharField(max_length=20)
@@ -40,7 +41,8 @@ class Post(models.Model):
 class Track(Post):
 	#data
 	allow_tags = True
-	audio_file = AudioField(upload_to='uploads/tracks/converted/%Y/%m/%d/', ext_whitelist=(".mp3", ".wav", ".ogg"))
+	audio_file = models.FileField(upload_to='uploads/tracks/converted/%Y/%m/%d/',
+		help_text='A track should be smaller than 10MiB')
 
 	image = models.ImageField(upload_to='uploads/images/%Y/%m/%d', 
 		help_text='Image should be smaller than 2MiB')
@@ -56,7 +58,20 @@ class Track(Post):
 	        player_string = '<ul class="playlist"><li style="width:250px;">\
 	        <a href="%s">%s</a></li></ul>' % (file_url, os.path.basename(self.audio_file.name))
 	        return format_html(player_string)
+	def __unicode__(self):
+		return self.title
 
 class Journal(Post):
 	body = MarkdownField()
 	bgimage = models.ImageField(upload_to='uploads/bgimage/%Y/%m/%d/')
+
+	def __unicode__(self):
+		return self.title
+
+
+@receiver(models.signals.post_delete, sender=Track)
+def delete_file_on_model_delete(sender, instance, **kwargs):
+	if instance.audio_file:
+		if os.path.isfile(instance.audio_file.path):
+			os.remove(instance.audio_file.path)
+
