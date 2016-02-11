@@ -1,15 +1,47 @@
 {% extends "base_sidebar.html" %}
 
+{% block scrollbar %}
+	<div class="navbar navbar-inverse" id='typetab' role="navigation">
+		<ul class="nav navbar-nav">
+			<li id="new" style="font-weight:bold;"><a href="#">New</a></li>
+			<li id="liked"><a href="#">Liked</a></li>
+			<li id="scraped"><a href="#">Scraped</a></li>
+		</ul>
+	</div>
+	<div id="linefeed">
+	</div>
+
+{% endblock scrollbar %}
+
 {% block content %}
 {{ block.super }}
 	<input id="start_from" value="0" hidden/>
 	<input id="type" value="new" hidden/>
 {% endblock content %}
 
-{% block scrollbar %}
-	<div id='scroll_feed'>
-	</div>
-{% endblock scrollbar %}
+
+{% block style %}
+{{ block.super }}
+<style>
+	#typetab {
+		border: 0px;
+		border-bottom: solid 2px #555555;
+		height: 40px;
+	}
+	#typetab > ul > li {
+		font-size: 15pt;
+
+	}
+	#linefeed {
+	}
+	.entity {
+		background-color: #ffffff;
+		height: 250px;
+		margin: 20px;
+	}
+</style>
+
+{% endblock style %}
 
 
 {% block script %}
@@ -31,22 +63,19 @@
 			success: function(data){
 				/*---adjust div height---*/
 				var entitynum = data.entitynum;
-				var entityheight = 300;
+				var entityheight = 270;
 				var height_added = entitynum * 200;
-				var content_height = (startfrom == 0) ? entitynum*entityheight:$('#content').height()+entitynum*entityheight;
+				var content_height = (startfrom == 0) ? entitynum*entityheight:$('#content').css('height')+entitynum*entityheight;
 
 				$('#content').css('height', content_height);//set contentdiv height
 				$(window).trigger('page:appended');//set inner div height
 
-				/*---create DOM---*/
-
+				/*---create DOMs and append them---*/
 				for(var i in data.entity){
 					$('<div></div>', {
 						class: 'entity entity-journal',
 						id: 'entity' + startfrom + i,
-
-
-					});
+					}).appendTo('#linefeed')
 				}
 
 			},
@@ -77,9 +106,12 @@
 		});
 		 $(window).on('page:appended', function(e){
 		 	//set div heigth according to #content
-		 	var height_content = $('#content').height();
+		 	var height_content = $('#content').css('height');
 		 	$('#scrollbar').css('height', height_content);
-		 	$('#sidebar').css('height', height_content);
+		 	$('#sidebar').css({
+		 		'height': height_content,
+		 		'top': '-'+height_content,
+		 	});
 		 });
 	});	
 </script>	
