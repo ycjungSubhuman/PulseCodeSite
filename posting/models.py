@@ -28,6 +28,9 @@ class Creator(models.Model):
 class Member(Creator):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 
+	def __unicode__(self):
+		return self.user.username
+
 class Team(Creator):
 	member = models.ManyToManyField(Member)
 	
@@ -37,6 +40,9 @@ class Post(models.Model):
 	tag = models.ManyToManyField(Tag)
 	liked_member = models.ManyToManyField(Member, related_name='liked_post', blank=True)
 	scraped_member = models.ManyToManyField(Member, related_name='scraped_post', blank=True)
+
+	def __unicode__(self):
+		return self.title
 
 class Track(Post):
 	#data

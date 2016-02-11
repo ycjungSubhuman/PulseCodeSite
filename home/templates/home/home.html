@@ -1,49 +1,86 @@
 {% extends "base_sidebar.html" %}
 
+{% block content %}
+{{ block.super }}
+	<input id="start_from" value="0" hidden/>
+	<input id="type" value="new" hidden/>
+{% endblock content %}
+
 {% block scrollbar %}
-
+	<div id='scroll_feed'>
+	</div>
 {% endblock scrollbar %}
-
-{% block sidebar %}
-{% endblock sidebar %}
 
 
 {% block script %}
 {{ block.super }}
 <script>
-	$(function(){
+	function getResult(){
+		//get where to start
+		var startfrom = $('#start_from').val();
+		var type = $('#type').val();
+		//ajax call
+		$.ajax({
+			type: "POST",
+			url: '{% url "home:home" %}',
+			data: {
+				'isscroll': true,
+				'startfrom': startfrom,
+				'type': type,
+			},
+			success: function(data){
+				/*---adjust div height---*/
+				var entitynum = data.entitynum;
+				var entityheight = 300;
+				var height_added = entitynum * 200;
+				var content_height = (startfrom == 0) ? entitynum*entityheight:$('#content').height()+entitynum*entityheight;
+
+				$('#content').css('height', content_height);//set contentdiv height
+				$(window).trigger('page:appended');//set inner div height
+
+				/*---create DOM---*/
+
+				for(var i in data.entity){
+					$('<div></div>', {
+						class: 'entity entity-journal',
+						id: 'entity' + startfrom + i,
+
+
+					});
+				}
+
+			},
+			failure: function(data){
+
+			},
+		});
+	}
+	function setContentHeight(height){
+
+	}
+	$(document).ready(function(){
 		$.ajaxSetup({
 			headers: {'X-CSRFToken': getCookie("csrftoken")}
 		});
 
-		function getResult(){
-			//get where to start
-			var startfrom = $('#start_from').val();
-			var type = $('#type').val();
-			//ajax call
-			$.ajax({
-				type: "POST",
-				url: '{% url "home:home" %}',
-				data: {
-					'isscroll': true,
-					'startfrom': startfrom,
-					'type': type,
-				}
-				success: function(data){
+		//on load, get 8 entities from the server
+		getResult()
 
-				},
-				failure: function(data){
+		
+		$(window).scroll(function(e){//scroll loading event
 
-				},
-			});
-		}
-		$(window).scroll(function(){//scroll loading event
-			//if page reached the bottom
-			if($(window).scrollTop()+$(window).height() >= ($(document).height()-200)){
+			//if page has reached the bottom, load more docs
+			if($(window).scrollTop()+$(window).height() >= ($(document).height()-50)){
 				getResult();
 			}
 
 		});
+		 $(window).on('page:appended', function(e){
+		 	//set div heigth according to #content
+		 	var height_content = $('#content').height();
+		 	$('#scrollbar').css('height', height_content);
+		 	$('#sidebar').css('height', height_content);
+		 });
 	});	
 </script>	
 {% endblock script %}
