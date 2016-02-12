@@ -2,18 +2,21 @@
 
 {% block scrollbar %}
 	<div class="navbar navbar-inverse" id='typetab' role="navigation">
-		<ul class="nav navbar-nav">
+		<ul class="nav">
 			<li id="new" style="font-weight:bold;"><a href="#">New</a></li>
 			<li id="liked"><a href="#">Liked</a></li>
 			<li id="scraped"><a href="#">Scraped</a></li>
 		</ul>
 	</div>
-	<div id="linefeed">
+	<div id="main">
+		<ul id="linefeed">
+		</ul>
 	</div>
 
 {% endblock scrollbar %}
 
 {% block content %}
+<span hidden>{{ csrf_token }}</span>
 {{ block.super }}
 	<input id="start_from" value="0" hidden/>
 	<input id="type" value="new" hidden/>
@@ -27,17 +30,124 @@
 		border: 0px;
 		border-bottom: solid 2px #555555;
 		height: 40px;
+		margin-bottom: 20px;
 	}
 	#typetab > ul > li {
+		color: #dddddd;
 		font-size: 15pt;
-
+		float: left;
+		padding-left: 10px;
 	}
 	#linefeed {
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
 	}
 	.entity {
-		background-color: #ffffff;
+		background-color: #111111;
 		height: 250px;
 		margin: 20px;
+		margin-top: 25px;
+		margin-bottom: 25px;
+		padding: 0;
+	}
+	.entitysection-background {
+		background-position: center center;
+		background-size: 150%;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		padding: 10px 10px 10px 10px;
+		position: relative;
+	}
+	.entitysection-background:before{
+		z-index: -1;
+		opacity:0.3;
+	}
+	.entitysection-background:hover{
+		opacity: 1;
+	}
+	.entitysection-backcontainer {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+	.entitysection-footer {
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		width: 100%;
+	}
+	.entitybutton {
+		padding: 7px;
+		padding-left: 15px;
+		padding-right: 15px;
+		border-radius: 3px;
+		margin-left: 10px;
+		margin-right: 10px;
+	}
+	.entitybutton-rightopen{
+		margin-right:0px;
+		border-top-right-radius: 0px;
+		border-bottom-right-radius: 0px
+	}
+	.entitybutton-leftopen{
+		margin-left:0px;
+		border-top-left-radius: 0px;
+		border-bottom-left-radius: 0px
+	}
+	.entitybutton-comment{
+		float: left;
+	}
+	.entitybutton-comment span:last-child {
+		position: relative;
+		margin-left: 7px;
+		top: -1px;
+	}
+	.entitybutton-like{
+		float: right;
+	}
+	.entitybutton-scrap{
+		float: right;
+	}
+	.header span{
+		background-color: #000000;
+		color: white;
+		opacity: 1;
+		padding-left: 5px;
+		padding-right: 5px;
+		padding-top: 2px;
+		padding-bottom: 1px;
+	}
+	.header span:hover{
+		background-color: #111111;
+		color: #aaaaaa;
+		opacity: 1;
+		padding-left: 5px;
+		padding-right: 5px;
+		padding-top: 2px;
+		padding-bottom: 1px;
+	}
+	.footertag{
+		background-color: #333333;
+		color: white;
+		padding-left: 5px;
+		padding-right: 5px;
+		padding-top: 2px;
+		padding-bottom: 1px;
+		margin-right: 5px;
+	}
+	.footertag:hover{
+		background-color: #888888;
+	}
+
+	.header-title{
+		font-size: 20pt;
+	}
+	@media all and (min-width:768px){
+		.entitysection-background {
+			background-size: 100%;
+		}
 	}
 </style>
 
@@ -47,7 +157,9 @@
 {% block script %}
 {{ block.super }}
 <script>
+	var do_getResult = true;//stops from multiple POST call
 	function getResult(){
+
 		//get where to start
 		var startfrom = $('#start_from').val();
 		var type = $('#type').val();
@@ -61,31 +173,93 @@
 				'type': type,
 			},
 			success: function(data){
-				/*---adjust div height---*/
-				var entitynum = data.entitynum;
-				var entityheight = 270;
-				var height_added = entitynum * 200;
-				var content_height = (startfrom == 0) ? entitynum*entityheight:$('#content').css('height')+entitynum*entityheight;
-
-				$('#content').css('height', content_height);//set contentdiv height
-				$(window).trigger('page:appended');//set inner div height
-
 				/*---create DOMs and append them---*/
 				for(var i in data.entity){
-					$('<div></div>', {
-						class: 'entity entity-journal',
-						id: 'entity' + startfrom + i,
-					}).appendTo('#linefeed')
-				}
+					dom_entity = $('<li></li>', {
+						class: 'entity',
+						id: (startfrom==0) ? 'entity'+startfrom+i : 'entity'+startfrom+i+1,
+					});
+					//add propercss class
+					if(data.entity[i].objtype == 'journal'){
+						dom_entity.addClass('entity-journal');
 
+						//layouting
+						var dom_background = $('<div></div>', {
+							class: 'entitysection-background',
+							id: dom_entity.attr('id')+'-background',
+						}).css('background-image', 'url('+data.entity[i].journal.bgimage_url+')');
+						var dom_backcontainer = $('<div></div>',{
+							class: 'entitysection-backcontainer'
+						});
+						var dom_header = $('<div></div>', {
+							class: 'entitysection-header',
+							id: dom_entity.attr('id')+'-header',
+						});
+						var dom_footer = $('<div></div>', {
+							class: 'entitysection-footer',
+							id: dom_entity.attr('id')+'-footer',
+						});
+						dom_background.append(dom_backcontainer);
+						dom_backcontainer.append(dom_header).append(dom_footer);
+						dom_entity.append(dom_background).appendTo('#linefeed');
+
+						//---header: add author, title, and tag
+						var header_author = $('<a></a>', {
+							href: '/user/'+data.entity[i].author,
+						}).html('<p class="header header-author"><span>'+data.entity[i].author+'</span></p>');
+						var header_title = $('<a></a>', {
+							href: '/journal/'+data.entity[i].author+'/'+data.entity[i].title,
+						}).html('<p class="header header-title"><span>'+data.entity[i].title+'</span></p>');
+
+						dom_header.append(header_author).append(header_title);
+						//tags
+						for(var tag_index in data.entity[i].tag){
+							var tagspan = $('<a></a>', {
+								href: '/search/tag/'+data.entity[i].tag[tag_index],
+							}).html('<span class="footertag">'+data.entity[i].tag[tag_index]+'</span>');
+							dom_header.append(tagspan);
+						}
+
+						//---footer: show tags and like/scrap buttons
+						//comment/like/scrap
+						comment_button = $('<button></button>', {
+							class: 'btn btn-default entitybutton entitybutton-comment',
+							id: dom_entity.attr('id')+'-comment',
+							title: 'View comments',
+						}).html('<span class="glyphicon glyphicon-comment"></span>'+'<span>'+data.entity[i].comment_num+'</span>');
+						like_button = $('<button></button>', {
+							class: 'btn btn-default entitybutton entitybutton-rightopen entitybutton-like',
+							id: dom_entity.attr('id')+'-like',
+							title: 'Like',
+						}).html('<span class="glyphicon glyphicon-heart"></span>');
+						scrap_button = $('<button></button>', {
+							class: 'btn btn-default entitybutton entitybutton-leftopen entitybutton-scrap',
+							id: dom_entity.attr('id')+'-like',
+							title: 'Scrap',
+						}).html('<span class="glyphicon glyphicon-star"></span>');
+
+						$('.entitybutton').attr("data-toggle", "tooltip");
+						$('[data-toggle="tooltip"]').tooltip();
+						dom_footer.append(scrap_button).append(like_button).append(comment_button);
+
+					}
+					else dom_entity.addClass('entity-track');
+				}
+				/*---change startfrom---*/
+				var entitynum = data.entitynum;
+				if(startfrom == 0) entitynum--;//EXCEPTION for startfrom==0:has to start form -1
+				$('#start_from').val(Number(startfrom)+entitynum);
+
+				/*---adjust div height---*/
+				var content_height = $('#linefeed').height();
+				$('#content').css('height', content_height+60+52);//set contentdiv height
+				$(window).trigger('page:appended');//set inner div height
+				do_getResult = true;
 			},
 			failure: function(data){
 
 			},
 		});
-	}
-	function setContentHeight(height){
-
 	}
 	$(document).ready(function(){
 		$.ajaxSetup({
@@ -97,12 +271,13 @@
 
 		
 		$(window).scroll(function(e){//scroll loading event
-
-			//if page has reached the bottom, load more docs
-			if($(window).scrollTop()+$(window).height() >= ($(document).height()-50)){
-				getResult();
+			if(do_getResult){
+				//if page has reached the bottom, load more docs
+				if($(window).scrollTop()+$(window).height() >= ($(document).height())-30){
+					do_getResult = false;
+					getResult();
+				}
 			}
-
 		});
 		 $(window).on('page:appended', function(e){
 		 	//set div heigth according to #content
@@ -113,6 +288,7 @@
 		 		'top': '-'+height_content,
 		 	});
 		 });
+
 	});	
 </script>	
 {% endblock script %}

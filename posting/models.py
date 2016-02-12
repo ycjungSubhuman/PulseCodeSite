@@ -73,6 +73,10 @@ class Journal(Post):
 
 	def __unicode__(self):
 		return self.title
+class Comment(models.Model):
+	author = models.ForeignKey(Member)
+	post = models.ForeignKey(Post, related_name='comment', on_delete=models.CASCADE)
+	text = models.CharField(max_length=140)
 
 
 @receiver(models.signals.post_delete, sender=Track)

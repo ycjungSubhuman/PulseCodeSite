@@ -38,7 +38,7 @@ class HomeView(TemplateView):
 				
 			# make json
 			result = {
-				'entitynum': entitynum,
+				'entitynum': len(new8),
 				'loaded': True,
 				'entity':[],
 			}
@@ -69,6 +69,7 @@ class HomeView(TemplateView):
 						'liked_num': len(liked_member),
 						'scraped_member': scraped_member,
 						'scraped_num': len(scraped_member),
+						'comment_num': len(obj.comment.all()),
 					}
 					# track specific
 					if objtype is 'track':
