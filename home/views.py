@@ -32,7 +32,7 @@ class HomeView(TemplateView):
 
 			# get 8 more from objects
 			if objects:
-				new8 = objects.all()[::-1][startfrom:entitynum] # newest 8
+				new8 = objects.all()[::-1][startfrom:startfrom+entitynum] # newest 8
 			else:
 				new8 = None
 				
@@ -70,6 +70,7 @@ class HomeView(TemplateView):
 						'scraped_member': scraped_member,
 						'scraped_num': len(scraped_member),
 						'comment_num': len(obj.comment.all()),
+						'bgimage_url': obj.track.image.url if objtype=='track' else obj.journal.bgimage.url
 					}
 					# track specific
 					if objtype is 'track':
@@ -79,7 +80,7 @@ class HomeView(TemplateView):
 						track = obj.track
 
 						entity['audio_url'] = track.audio_file.url
-						entity['image_url'] = track.image.url
+						entity['bgimage_url'] = track.image.url
 						entity['description'] = track.description
 						datetime = track.datetime
 						entity['datetime'] = {
@@ -97,7 +98,6 @@ class HomeView(TemplateView):
 						entity = entity['journal']
 						journal = obj.journal
 
-						entity['bgimage_url'] = journal.bgimage.url
 
 			else: # the new list is empty
 				result['loaded'] = False

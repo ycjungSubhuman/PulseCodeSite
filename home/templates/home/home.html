@@ -107,8 +107,17 @@
 	.entitybutton-like{
 		float: right;
 	}
+	.entitybutton-like span:last-child {
+		position: relative;
+		margin-left: 7px;
+		top: -1px;
+	}
 	.entitybutton-scrap{
 		float: right;
+		border-left: solid 1px #222222;
+	}
+	.entitybutton-scrap:hover{
+		border-left: solid 1px #222222;
 	}
 	.header span{
 		background-color: #000000;
@@ -157,7 +166,7 @@
 {% block script %}
 {{ block.super }}
 <script>
-	var do_getResult = true;//stops from multiple POST call
+	var do_getResult = false;//stops from multiple POST call
 	function getResult(){
 
 		//get where to start
@@ -177,77 +186,86 @@
 				for(var i in data.entity){
 					dom_entity = $('<li></li>', {
 						class: 'entity',
-						id: (startfrom==0) ? 'entity'+startfrom+i : 'entity'+startfrom+i+1,
+						id: 'entity'+startfrom+i,
 					});
+
+					//layouting
+					var dom_background = $('<div></div>', {
+						class: 'entitysection-background',
+						id: dom_entity.attr('id')+'-background',
+					}).css('background-image', 'url('+data.entity[i].bgimage_url+')');
+					var dom_backcontainer = $('<div></div>',{
+						class: 'entitysection-backcontainer'
+					});
+					var dom_header = $('<div></div>', {
+						class: 'entitysection-header',
+						id: dom_entity.attr('id')+'-header',
+					});
+					var dom_footer = $('<div></div>', {
+						class: 'entitysection-footer',
+						id: dom_entity.attr('id')+'-footer',
+					});
+					dom_background.append(dom_backcontainer);
+					dom_backcontainer.append(dom_header).append(dom_footer);
+					dom_entity.append(dom_background).appendTo('#linefeed');
+
+					//---header: add author, title, and tag
+					var header_author = $('<a></a>', {
+						href: '/user/'+data.entity[i].author,
+					}).html('<p class="header header-author"><span>'+data.entity[i].author+'</span></p>');
+					var header_title = $('<a></a>', {
+						href: '/'+data.entity[i].objtype+'/'+data.entity[i].author+'/'+data.entity[i].title,
+					}).html('<p class="header header-title"><span>'+data.entity[i].title+'</span></p>');
+
+					dom_header.append(header_author).append(header_title);
+					//tags
+					for(var tag_index in data.entity[i].tag){
+						var tagspan = $('<a></a>', {
+							href: '/search/tag/'+data.entity[i].tag[tag_index],
+						}).html('<span class="footertag">'+data.entity[i].tag[tag_index]+'</span>');
+						dom_header.append(tagspan);
+					}
+
+					//---footer: show tags and like/scrap buttons
+					//comment/like/scrap
+					var comment_button = $('<button></button>', {
+						class: 'btn btn-default entitybutton entitybutton-comment',
+						id: dom_entity.attr('id')+'-comment',
+						title: 'View comments',
+					}).html('<span class="glyphicon glyphicon-comment"></span>'+'<span>'+data.entity[i].comment_num+'</span>');
+					var like_button = $('<button></button>', {
+						class: 'btn btn-default entitybutton entitybutton-rightopen entitybutton-like',
+						id: dom_entity.attr('id')+'-like',
+						title: 'Like',
+					}).html('<span class="glyphicon glyphicon-heart"></span>'+'<span>'+data.entity[i].liked_num+'</span>');
+					var scrap_button = $('<button></button>', {
+						class: 'btn btn-default entitybutton entitybutton-leftopen entitybutton-scrap',
+						id: dom_entity.attr('id')+'-like',
+						title: 'Scrap',
+					}).html('<span class="glyphicon glyphicon-star"></span>');
+
+					$('.entitybutton').attr("data-toggle", "tooltip");
+					$('[data-toggle="tooltip"]').tooltip();
+					dom_footer.append(scrap_button).append(like_button).append(comment_button);
+
 					//add propercss class
 					if(data.entity[i].objtype == 'journal'){
 						dom_entity.addClass('entity-journal');
+					}
+					else{
+						dom_entity.addClass('entity-track');
 
-						//layouting
-						var dom_background = $('<div></div>', {
-							class: 'entitysection-background',
-							id: dom_entity.attr('id')+'-background',
-						}).css('background-image', 'url('+data.entity[i].journal.bgimage_url+')');
-						var dom_backcontainer = $('<div></div>',{
-							class: 'entitysection-backcontainer'
+						//add player
+						var player = $('<div></div>', {
+							class: 'entity-player',
+							id: dom_entity.attr('id')+'-player',
 						});
-						var dom_header = $('<div></div>', {
-							class: 'entitysection-header',
-							id: dom_entity.attr('id')+'-header',
-						});
-						var dom_footer = $('<div></div>', {
-							class: 'entitysection-footer',
-							id: dom_entity.attr('id')+'-footer',
-						});
-						dom_background.append(dom_backcontainer);
-						dom_backcontainer.append(dom_header).append(dom_footer);
-						dom_entity.append(dom_background).appendTo('#linefeed');
 
-						//---header: add author, title, and tag
-						var header_author = $('<a></a>', {
-							href: '/user/'+data.entity[i].author,
-						}).html('<p class="header header-author"><span>'+data.entity[i].author+'</span></p>');
-						var header_title = $('<a></a>', {
-							href: '/journal/'+data.entity[i].author+'/'+data.entity[i].title,
-						}).html('<p class="header header-title"><span>'+data.entity[i].title+'</span></p>');
-
-						dom_header.append(header_author).append(header_title);
-						//tags
-						for(var tag_index in data.entity[i].tag){
-							var tagspan = $('<a></a>', {
-								href: '/search/tag/'+data.entity[i].tag[tag_index],
-							}).html('<span class="footertag">'+data.entity[i].tag[tag_index]+'</span>');
-							dom_header.append(tagspan);
-						}
-
-						//---footer: show tags and like/scrap buttons
-						//comment/like/scrap
-						comment_button = $('<button></button>', {
-							class: 'btn btn-default entitybutton entitybutton-comment',
-							id: dom_entity.attr('id')+'-comment',
-							title: 'View comments',
-						}).html('<span class="glyphicon glyphicon-comment"></span>'+'<span>'+data.entity[i].comment_num+'</span>');
-						like_button = $('<button></button>', {
-							class: 'btn btn-default entitybutton entitybutton-rightopen entitybutton-like',
-							id: dom_entity.attr('id')+'-like',
-							title: 'Like',
-						}).html('<span class="glyphicon glyphicon-heart"></span>');
-						scrap_button = $('<button></button>', {
-							class: 'btn btn-default entitybutton entitybutton-leftopen entitybutton-scrap',
-							id: dom_entity.attr('id')+'-like',
-							title: 'Scrap',
-						}).html('<span class="glyphicon glyphicon-star"></span>');
-
-						$('.entitybutton').attr("data-toggle", "tooltip");
-						$('[data-toggle="tooltip"]').tooltip();
-						dom_footer.append(scrap_button).append(like_button).append(comment_button);
 
 					}
-					else dom_entity.addClass('entity-track');
 				}
 				/*---change startfrom---*/
 				var entitynum = data.entitynum;
-				if(startfrom == 0) entitynum--;//EXCEPTION for startfrom==0:has to start form -1
 				$('#start_from').val(Number(startfrom)+entitynum);
 
 				/*---adjust div height---*/
