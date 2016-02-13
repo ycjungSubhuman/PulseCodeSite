@@ -25,140 +25,8 @@
 
 {% block style %}
 {{ block.super }}
-<style>
-	#typetab {
-		border: 0px;
-		border-bottom: solid 2px #555555;
-		height: 40px;
-		margin-bottom: 20px;
-	}
-	#typetab > ul > li {
-		color: #dddddd;
-		font-size: 15pt;
-		float: left;
-		padding-left: 10px;
-	}
-	#linefeed {
-		margin: 0;
-		padding: 0;
-		list-style-type: none;
-	}
-	.entity {
-		background-color: #111111;
-		height: 250px;
-		margin: 20px;
-		margin-top: 25px;
-		margin-bottom: 25px;
-		padding: 0;
-	}
-	.entitysection-background {
-		background-position: center center;
-		background-size: 150%;
-		width: 100%;
-		height: 100%;
-		margin: 0;
-		padding: 10px 10px 10px 10px;
-		position: relative;
-	}
-	.entitysection-background:before{
-		z-index: -1;
-		opacity:0.3;
-	}
-	.entitysection-background:hover{
-		opacity: 1;
-	}
-	.entitysection-backcontainer {
-		position: relative;
-		width: 100%;
-		height: 100%;
-	}
-	.entitysection-footer {
-		position: absolute;
-		left: 0;
-		bottom: 0;
-		width: 100%;
-	}
-	.entitybutton {
-		padding: 7px;
-		padding-left: 15px;
-		padding-right: 15px;
-		border-radius: 3px;
-		margin-left: 10px;
-		margin-right: 10px;
-	}
-	.entitybutton-rightopen{
-		margin-right:0px;
-		border-top-right-radius: 0px;
-		border-bottom-right-radius: 0px
-	}
-	.entitybutton-leftopen{
-		margin-left:0px;
-		border-top-left-radius: 0px;
-		border-bottom-left-radius: 0px
-	}
-	.entitybutton-comment{
-		float: left;
-	}
-	.entitybutton-comment span:last-child {
-		position: relative;
-		margin-left: 7px;
-		top: -1px;
-	}
-	.entitybutton-like{
-		float: right;
-	}
-	.entitybutton-like span:last-child {
-		position: relative;
-		margin-left: 7px;
-		top: -1px;
-	}
-	.entitybutton-scrap{
-		float: right;
-		border-left: solid 1px #222222;
-	}
-	.entitybutton-scrap:hover{
-		border-left: solid 1px #222222;
-	}
-	.header span{
-		background-color: #000000;
-		color: white;
-		opacity: 1;
-		padding-left: 5px;
-		padding-right: 5px;
-		padding-top: 2px;
-		padding-bottom: 1px;
-	}
-	.header span:hover{
-		background-color: #111111;
-		color: #aaaaaa;
-		opacity: 1;
-		padding-left: 5px;
-		padding-right: 5px;
-		padding-top: 2px;
-		padding-bottom: 1px;
-	}
-	.footertag{
-		background-color: #333333;
-		color: white;
-		padding-left: 5px;
-		padding-right: 5px;
-		padding-top: 2px;
-		padding-bottom: 1px;
-		margin-right: 5px;
-	}
-	.footertag:hover{
-		background-color: #888888;
-	}
-
-	.header-title{
-		font-size: 20pt;
-	}
-	@media all and (min-width:768px){
-		.entitysection-background {
-			background-size: 100%;
-		}
-	}
-</style>
+	{% load static %}
+	<link href="{% static 'home.css' %}" rel="stylesheet">
 
 {% endblock style %}
 
@@ -256,12 +124,76 @@
 						dom_entity.addClass('entity-track');
 
 						//add player
+						//player division 
 						var player = $('<div></div>', {
 							class: 'entity-player',
 							id: dom_entity.attr('id')+'-player',
 						});
+						var player_small = $('<div></div>', {
+							class: 'entity-player entity-player-small',
+						}).hide();
+						var button_section = $('<div></div>', {
+							class: 'player-buttondiv'
+						});
+						var scrubber_section = $('<div></div>', {
+							class: 'player-timebardiv',
+						});
+						var timedigit_section = $('<div></div>', {
+							class: 'player-timedigitdiv'
+						});
+						//assembly div
+						player.append(player_small);
+						player_small.append(button_section).append(scrubber_section).append(timedigit_section);
+						dom_header.after(player);
 
+						//player components
+						var audio = $('<audio></audio>', {
+							class: 'audio',
+							src: data.entity[i].track.audio_url,
+							preload: 'none',
+						});
+						var overlapped_button = $('<button></button>', {
+							class: 'btn btn-default audiobutton audiobutton-overlapped',
+							title: 'Play the track',
+						}).html('<span class="glyphicon glyphicon-play"></span><span>Play</span>');
+						var play_button = $('<button></button>', {
+							class: 'btn, btn-default audiobutton audiobutton-small',
+							role: 'play',
+							title: 'Play',
+						}).html('<span class="glyphicon glyphicon-play"></span>').hide();
+						var pause_button = $('<button></button>', {
+							class: 'btn, btn-default audiobutton audiobutton-small',
+							role: 'pause',
+							title: 'pause',
+						}).html('<span class="glyphicon glyphicon-pause"></span>');
+						var scrubber_wrapper = $('<div></div>', {
+							class: 'wrapper-scrubber',
+						});
+						var scrubber = $('<span></span>', {
+							class: 'scrubber scrubber-background',
+							id: dom_entity.attr('id')+'-scrubber',
+						});
+						var scrubber_loaded = $('<span></span>', {
+							class: 'scrubber scrubber-loaded',
+							id: dom_entity.attr('id')+'-scrubber-loaded',
+						});
+						var scrubber_played = $('<span></span>', {
+							class: 'scrubber scrubber-played',
+							id: dom_entity.attr('id')+'-scrubber-played',
+						});
+						var playtime = $('<span></span>', {
+							class: 'playtime',
+							id: dom_entity.attr('id')+'-playtime',
+						}).text('00:00');
+						//assembly components
+						player.append(audio).append(overlapped_button);
+						button_section.append(play_button).append(pause_button);
+						scrubber_wrapper.append(scrubber);
+						scrubber_section.append(scrubber_wrapper);
+						scrubber.append(scrubber_loaded).append(scrubber_played);
+						timedigit_section.append(playtime);
 
+						//define component actions
 					}
 				}
 				/*---change startfrom---*/
@@ -273,6 +205,8 @@
 				$('#content').css('height', content_height+60+52);//set contentdiv height
 				$(window).trigger('page:appended');//set inner div height
 				do_getResult = true;
+
+				//action
 			},
 			failure: function(data){
 
@@ -297,7 +231,7 @@
 				}
 			}
 		});
-		 $(window).on('page:appended', function(e){
+		$(window).on('page:appended', function(e){
 		 	//set div heigth according to #content
 		 	var height_content = $('#content').css('height');
 		 	$('#scrollbar').css('height', height_content);
@@ -305,8 +239,55 @@
 		 		'height': height_content,
 		 		'top': '-'+height_content,
 		 	});
-		 });
+		});
 
+		//audio player action define
+		//big 'play' button
+		$(document).on('click', '.audiobutton-overlapped', function(){
+			var audio = $(this).parent().find('audio');
+			$(this).hide();
+			$(this).parent().find('.entity-player-small').show();
+			$(this).parent().find('audio').load();
+			$(this).parent().find('audio')[0].play();
+
+			//event firing
+			audio[0].loaded_updator = setInterval(function(){
+				audio.trigger('updator:loading');
+				return false;
+			}, 500);
+			audio[0].played_updator = setInterval(function(){
+				audio.trigger('updator:playing');
+				return false;
+			}, 500);
+		});
+		//timebar & timedigit
+		$(document).on('updator:loading', 'audio', function(e){
+			var audio = e.target;
+			var duration = audio.duration;
+			var buffered;
+			for(var i=0; i<audio.buffered.length; i++){
+				buffered = buffered>audio.buffered.end(i) ? buffered:audio.buffered.end(i);
+			}
+			var width_full = parseInt($(audio).parent().find('.scrubber-background').css('width'), 10);
+			var loaded_length = width_full * buffered/duration;
+			$(audio).parent().find('.scrubber-loaded').css('width', loaded_length);
+
+			if(buffered == duration){
+				clearInterval(audio.loaded_updator);
+				console.log('stopped loading');
+			}
+		});
+		$(document).on('updator:playing', 'audio', function(e){
+			var audio = e.target;
+			var duration = audio.duration;
+			var current = audio.currentTime;
+			var width_full = parseInt($(audio).parent().find('.scrubber-background').css('width'), 10);
+			var played_length = width_full * current/duration;
+			var digit_current = pad(parseInt(current/60, 10), 2) + ':' + pad(parseInt(current)%60, 2);
+
+			$(audio).parent().find('.scrubber-played').css('width', played_length);
+			$(audio).parent().find('.playtime').text(digit_current);
+		});
 	});	
 </script>	
 {% endblock script %}

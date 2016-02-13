@@ -1,0 +1,224 @@
+#typetab {
+	border: 0px;
+	border-bottom: solid 2px #555555;
+	height: 40px;
+	margin-bottom: 20px;
+}
+#typetab > ul > li {
+	color: #dddddd;
+	font-size: 15pt;
+	float: left;
+	padding-left: 10px;
+}
+#linefeed {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+.entity {
+	background-color: #111111;
+	height: 250px;
+	margin: 20px;
+	margin-top: 25px;
+	margin-bottom: 25px;
+	padding: 0;
+}
+.entitysection-background {
+	background-position: center center;
+	background-size: 150%;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 10px 10px 10px 10px;
+	position: relative;
+}
+.entitysection-background:before{
+	z-index: -1;
+	opacity:0.3;
+}
+.entitysection-background:hover{
+	opacity: 1;
+}
+.entitysection-backcontainer {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.entitysection-footer {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+}
+.entitybutton {
+	padding: 7px;
+	padding-left: 15px;
+	padding-right: 15px;
+	border-radius: 3px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+.entitybutton-rightopen{
+	margin-right:0px;
+	border-top-right-radius: 0px;
+	border-bottom-right-radius: 0px
+}
+.entitybutton-leftopen{
+	margin-left:0px;
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px
+}
+.entitybutton-comment{
+	float: left;
+}
+.entitybutton-comment span:last-child {
+	position: relative;
+	margin-left: 7px;
+	top: -1px;
+}
+.entitybutton-like{
+	float: right;
+}
+.entitybutton-like span:last-child {
+	position: relative;
+	margin-left: 7px;
+	top: -1px;
+}
+.entitybutton-scrap{
+	float: right;
+	border-left: solid 1px #222222;
+}
+.entitybutton-scrap:hover{
+	border-left: solid 1px #222222;
+}
+.header span{
+	background-color: #000000;
+	color: white;
+	opacity: 1;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 2px;
+	padding-bottom: 1px;
+}
+.header span:hover{
+	background-color: #111111;
+	color: #aaaaaa;
+	opacity: 1;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 2px;
+	padding-bottom: 1px;
+}
+.footertag{
+	background-color: #333333;
+	color: white;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 2px;
+	padding-bottom: 1px;
+	margin-right: 5px;
+}
+.footertag:hover{
+	background-color: #888888;
+}
+
+.header-title{
+	font-size: 20pt;
+}
+.entity-player {
+	width: 100%;
+	padding-top: 20px;
+}
+.entity-player-small {
+	width: 100%;
+	height: 50px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.player-buttondiv {
+	float: left;
+	width: 30px;
+	height: 30px;
+}
+.player-timebardiv{
+	position: relative;
+	height: 30px;
+	padding-left: 20px;
+	padding-right: 0px;
+	padding-top: 10px;
+	margin-left: 30px;
+	margin-right: 40px;
+	top: 2px;
+
+}
+.player-timedigitdiv {
+	float: right;
+	position: relative;
+	top: -30px;
+	height: 30px;
+	width: 40px;
+}
+.player-timedigitdiv span {
+	background-color: #000000;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 1px;
+	border-radius: 3px;
+}
+.audiobutton {
+	background-color: #333333;
+}
+.audiobutton-overlapped {
+	display: block;
+	max-width: 200px;
+	width: 60%;
+	height: 50px;
+	margin-left: auto;
+	margin-right: auto;
+	border: solid 1px #555555;
+	border-radius: 2px;
+}
+.audiobutton-overlapped span:last-child {
+	margin-left: 10px;
+}
+.audiobutton-small {
+	float: left;
+	padding: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-radius: 3px;
+}
+.wrapper-scrubber {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.scrubber {
+	height: 5px;
+	background-color: #ffffff;
+	position: absolute;
+	left: 0;
+}
+
+.scrubber-background {
+	width: 100%;
+}
+.scrubber-loaded {
+	width: 0;
+	background-color: #aaaaaa;
+}
+.scrubber-played {
+	width: 0;
+	background-color: #333333;
+}
+
+
+
+
+
+@media all and (min-width:768px){
+	.entitysection-background {
+		background-size: 100%;
+	}
+}
