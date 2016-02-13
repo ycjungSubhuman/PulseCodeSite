@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'home',
     'achievement',
     'posting',
-    'django_markdown',
+    'markdown',
 ]
 
 MIDDLEWARE_CLASSES = [

@@ -2,8 +2,6 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Button, Div, Field, Submit
 from posting.models import Track, Journal
-from audiofield.widgets import CustomerAudioFileWidget
-from django_markdown.widgets import MarkdownWidget
 
 class TrackUploadForm(forms.ModelForm):
 	class Meta:
@@ -14,7 +12,7 @@ class TrackUploadForm(forms.ModelForm):
 			'image',
 			'description',
 		]
-	audio_file = forms.FileField(widget=CustomerAudioFileWidget)
+	audio_file = forms.FileField()
 	tag_string = forms.CharField(max_length=50,
 		help_text='Split each tag with ,(comma), only Alphabets allowed')
 
@@ -93,6 +91,5 @@ class JournalForm(forms.ModelForm):
 			Field('bgimage', id='bgimage_form'),
 			Submit('submit', 'Submit', id='submit'),
 		)
-		self.fields['body'].widget = MarkdownWidget()
 
 

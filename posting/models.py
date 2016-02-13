@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from pulsecode import settings
 from django.utils.html import format_html
-from django_markdown.models import MarkdownField
 import os
 
 
@@ -68,7 +67,7 @@ class Track(Post):
 		return self.title
 
 class Journal(Post):
-	body = MarkdownField()
+	body = models.TextField()
 	bgimage = models.ImageField(upload_to='uploads/bgimage/%Y/%m/%d/')
 
 	def __unicode__(self):
