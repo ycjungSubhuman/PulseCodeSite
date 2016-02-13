@@ -181,6 +181,10 @@
 							class: 'scrubber scrubber-played',
 							id: dom_entity.attr('id')+'-scrubber-played',
 						});
+						var scrubber_nav = $('<span></span>', {
+							class: 'scrubber scrubber-nav',
+							id: dom_entity.attr('id')+'-scrubber-nav',
+						});
 						var playtime = $('<span></span>', {
 							class: 'playtime',
 							id: dom_entity.attr('id')+'-playtime',
@@ -190,7 +194,7 @@
 						button_section.append(play_button).append(pause_button);
 						scrubber_wrapper.append(scrubber);
 						scrubber_section.append(scrubber_wrapper);
-						scrubber.append(scrubber_loaded).append(scrubber_played);
+						scrubber.append(scrubber_loaded).append(scrubber_played).append(scrubber_nav);
 						timedigit_section.append(playtime);
 
 						//define component actions
@@ -258,7 +262,7 @@
 			audio[0].played_updator = setInterval(function(){
 				audio.trigger('updator:playing');
 				return false;
-			}, 500);
+			}, 100);
 		});
 		//timebar & timedigit
 		$(document).on('updator:loading', 'audio', function(e){
@@ -274,10 +278,9 @@
 
 			if(buffered == duration){
 				clearInterval(audio.loaded_updator);
-				console.log('stopped loading');
 			}
 		});
-		$(document).on('updator:playing', 'audio', function(e){
+		function keepTrackPlayed(e){
 			var audio = e.target;
 			var duration = audio.duration;
 			var current = audio.currentTime;
@@ -287,6 +290,43 @@
 
 			$(audio).parent().find('.scrubber-played').css('width', played_length);
 			$(audio).parent().find('.playtime').text(digit_current);
+		}
+		$(document).on('updator:playing', 'audio', keepTrackPlayed);
+
+		$(document).on('mousemove click', '.scrubber-nav', function(e){
+			$(document).off('updator:playing');	
+
+			var audio = $(e.target).parents('.entity-player').find('audio')[0]
+			var offset = $(this).offset();
+			var mousepos = e.pageX - offset.left;
+			var width_full = parseInt($(audio).parent().find('.scrubber-background').css('width'), 10);
+			var duration = audio.duration;
+			var navtime = duration * mousepos/width_full;
+			var navtext = pad(parseInt(navtime/60, 10), 2) + ':' + pad(parseInt(navtime)%60, 2);
+
+			$(e.target).parents('.entity-player').find('.scrubber-played').css('width', mousepos).css('background-color', '#333355')
+			$(e.target).parents('.entity-player').find('.playtime').text(navtext).css('color', '#7777dd');
+			if(e.type == 'click'){
+				audio.currentTime = navtime;
+			}
+		});
+		$(document).on('touchstart', '.scrubber-nav', function(e){
+			var audio = $(e.target).parents('.entity-player').find('audio')[0]
+			var touch = e.originalEvent.touches[0];
+			var offset = $(this).offset();
+			var mousepos = touch.pageX - offset.left;
+			var width_full = parseInt($(audio).parent().find('.scrubber-background').css('width'), 10);
+			var duration = audio.duration;
+			var navtime = duration * mousepos/width_full;
+
+			audio.currentTime = navtime;
+		});
+		$(document).on('mouseout', '.scrubber-nav', function(e){
+			$(e.target).parents('.entity-player').find('.scrubber-played').css('background-color', '#333333');
+			$(e.target).parents('.entity-player').find('.playtime').css('color', '#ffffff');
+			$(document).on('updator:playing', 'audio', keepTrackPlayed);
+			$(e.target).parents('.entity-player').find('audio').trigger('updator:playing');
+
 		});
 	});	
 </script>	
