@@ -103,6 +103,7 @@ class HomeView(TemplateView):
 				result['loaded'] = False
 
 		else: # not a scroll request, other requests like sidebar
+			pass
 
 
 		return JsonResponse(result)

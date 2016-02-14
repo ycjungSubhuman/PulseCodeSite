@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from upload.models import JournalUpload
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from pulsecode import settings
@@ -55,14 +54,6 @@ class Track(Post):
 	description = models.CharField(max_length=140)
 	datetime = models.DateTimeField(auto_now=True)
 
-	def audio_file_player(self):
-	    """audio player tag for admin"""
-	    self.allow_tags
-	    if self.audio_file:
-	        file_url = settings.MEDIA_URL + str(self.audio_file)
-	        player_string = '<ul class="playlist"><li style="width:250px;">\
-	        <a href="%s">%s</a></li></ul>' % (file_url, os.path.basename(self.audio_file.name))
-	        return format_html(player_string)
 	def __unicode__(self):
 		return self.title
 

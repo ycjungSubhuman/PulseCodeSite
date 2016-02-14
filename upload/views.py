@@ -1,9 +1,12 @@
-from django.shortcuts import render
-from django.views.generic.base import TemplateView
+from django.shortcuts import render, get_object_or_404
+from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import FormView
+from django.core.urlresolvers import reverse
 from upload.forms import TrackUploadForm, JournalForm
 from posting.models import Track, Member, Tag, Journal
+from upload.models import Image
 from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 
 def addFromRawTagstring(modelinst, tagstring):
 	tags = tagstring.split(',')
@@ -58,39 +61,70 @@ class TrackUploadFormView(FormView):
 
 		return super(TrackUploadFormView, self).form_valid(form)
 
-class JournalWriteView(FormView):
+class JournalWriteView(TemplateView):
 	template_name = 'upload/write.html'
-	form_class = JournalForm
 
-	def form_valid(self, form):
+	def post(self, request):
 		"""fill in the fields
 
 			title, author, body, bgimage, tag
 		"""
+		print 'enteredjournal'
 		journal = Journal()
 
 		# - title
-		journal.title = form.cleaned_data['title']
+		journal.title = request.POST['title']
 
-		# - author
-		try: 
-			journal.author = Member.objects.get(user=self.request.user)
-		except Member.DoesNotExist: # user not defined in server
-			raise PermissionDenied
+		try:
+			# - author
+			journal.author = get_object_or_404(Member, user=request.user)
+		except:
+			return HttpResponse('<p>You are not authorized. Please login.')
 			
 		# - body
-		journal.body = form.cleaned_data['body']
+		journal.body = request.POST['body']
 
 		# - bgimage
-		journal.bgimage = self.request.FILES['bgimage']
+		journal.bgimage = request.FILES['bgimage']
 
 		journal.save()
 
-		tag_string = form.cleaned_data['tag_string']
+		tag_string = request.POST['tag_string']
 		addFromRawTagstring(journal, tag_string)
 
-		return super(JournalWriteView, self).form_valid(form)
+		return HttpResponseRedirect(reverse('home:home'));
 
+	def is_valid(self, request):
+		# - check the size of Image
+		size_image = self.cleaned_data['image'].size
+		if size_image > 2*1024*1024: # 2MiB
+			self._errors['image_exceed'] = 'Image size exceeds 2MiB'
+			return False
 
+		# - tag format test --- all should be alphabet
+		tags = self.cleaned_data['tag_string'].split(',')
+		tags[:] = [tag.strip() for tag in tags]
+		for tag in tags:
+			if not tag.isalpha():
+				return False
+
+		# - test all-passed
+		return True	
+
+class ImageUpload(View):
+	def post(self, request):
+		success = False
+		try:
+			image = request.FILES['image']
+			upload = Image()
+			upload.image = image
+			upload.save()
+			success = True
+		except:
+			success = False
+
+		result = {'success': success, 'url': upload.image.url,}
+
+		return JsonResponse(result)
 
 

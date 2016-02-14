@@ -96,6 +96,7 @@ $(document).ready(function(){
 	});
 	$(document).on('audio:play', 'audio', function(e){
 		var audio = e.target;
+		$('audio').trigger('audio:pause');
 		audio.play();
 		$(this).parent().find('[role="pause"]').show();
 		$(this).parent().find('[role="play"]').hide();

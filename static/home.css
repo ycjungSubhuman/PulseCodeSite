@@ -91,6 +91,11 @@
 .entitybutton-scrap:hover{
 	border-left: solid 1px #222222;
 }
+.header {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+}
 .header span{
 	background-color: #000000;
 	color: white;
@@ -123,7 +128,9 @@
 }
 
 .header-title{
+	position: relative;
 	font-size: 20pt;
+	max-width: 100%;
 }
 .entity-player {
 	width: 100%;

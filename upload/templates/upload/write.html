@@ -121,6 +121,7 @@
 		color: black;
 		padding: 10px;
 		padding-top: 20px;
+		overflow: scroll;
 	}
 	.trackbutton {
 		float: right;
@@ -131,6 +132,26 @@
 	}
 	[role="render"] {
 		background-color: #44d333;
+	}
+
+
+	.modal-content p {
+		color: #aaaaaa;
+	}
+	.imagepreview {
+		width: 100%;
+		height: 250px;
+		overflow: hidden;
+		position: relative;
+		background-color: #111111;
+		background-size: 100%;
+		background-position: center center;
+	}
+	.button-submit {
+		background-color: #dd3333;
+		display: block;
+		margin: auto;
+		margin-top: 10px;
 	}
 
 	@media all and (min-width:768px){
@@ -145,19 +166,19 @@
 {% block content %}
 <div class="screen-whole">
 	<div class="screen-bottom">
-		<form class="markdownwriter" role="markdownwriter" method="post" action="{% url 'upload:journal' %}">
+		<form class="markdownwriter" role="markdownwriter" method="post" action="{% url 'upload:journal' %}" enctype="multipart/form-data">
 			{% csrf_token %}
 			<div class="editor editor-topbar">
 				<div class="editor-topbar-title">
 					<textarea name="title" class="editor editor-textarea editor-textarea-small" role="title"></textarea>
 				</div>
-				<input type="submit" tabindex=5 class="btn btn-default" role="submit" value="Submit" />
+				<button type="button" tabindex=5 class="btn btn-default" data-toggle="modal" data-target="#bgimagesubmit" role="submit">Next</button>
 			</div>
 			<div class="editor editor-bottom">
 				<div class="editor editor-wrapper">
 					<div class="editor editor-original">
 						<div class="editor editor-tagbar">
-							<textarea name="tagstring" class="editor editor-textarea editor-textarea-small" role="tags"></textarea>
+							<textarea name="tag_string" class="editor editor-textarea editor-textarea-small" role="tags"></textarea>
 						</div>
 						<div class="editor editor-body">
 							<div class="editor editor-textwrapper">
@@ -171,6 +192,26 @@
 						<button type="button" class="btn btn-default trackbutton" role="track-on">Tracking Off. Click to turn on</button>
 						<button type="button" class="btn btn-default trackbutton" role="render">Render</button>
 						<div class="editor-preview-body markdown-body" role="markdown">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal fade" role="dialog" tabindex="-1" id="bgimagesubmit">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+						<p>Final Step... Upload a background image</p>
+						</div>
+						<div class="modal-body">
+							<div class="imagepreview">
+							</div>
+							<div class="fileUpload btn btn-default">
+								<span>Select Image</span>
+								<input type="file" name="bgimage" class="upload" role="bgimage" value="File"/>
+							</div>
+							<input type="submit" class="btn btn-default button-submit" value="Finish" />
+						</div>
+						<div class="modal-footer">
 						</div>
 					</div>
 				</div>
@@ -218,6 +259,7 @@
 				$('[role="markdown"]').html(converter.makeHtml($(this).val()));
 		})
 
+		//tab key
 		$(document).on('keydown', '[role="original"]', function(e){
 			var keyCode = e.keyCode || e.which;
 
@@ -237,7 +279,23 @@
 			    $(this).get(0).selectionEnd = start + 1;
 			}
 		});
+		//bgimage preview
+		$('[role="bgimage"]').change(function(e){
+			readURL(this);
+			$('[type="submit"]').show();
+		});
+		function readURL(input) {
+		    if (input.files && input.files[0]) {
+		        var reader = new FileReader();
 
+		        reader.onload = function (e) {
+		            $('.imagepreview').css('background-image', 'url('+e.target.result+')');
+		        }
+
+		        reader.readAsDataURL(input.files[0]);
+		    }
+		}
+		$('[type="submit"]').hide();
 	});
 </script>
 

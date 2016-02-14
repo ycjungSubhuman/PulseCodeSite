@@ -27,7 +27,6 @@ class TrackUploadForm(forms.ModelForm):
 		self.helper.layout = Layout(
 			Div( #this div is for track upload form
 				Field('audio_file', id='audio_form'),
-				Button('upload', "Upload", id='upload_button', css_class='btn btn-default'),
 			),
 			Div( # this div is for information form
 				Field('image', id='image_form'),
