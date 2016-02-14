@@ -9,11 +9,11 @@ class HomeView(TemplateView):
 
 	def post(self, request):
 		isscroll = request.POST['isscroll']
-		startfrom = int(request.POST['startfrom'])
-		linetype = request.POST['type']
-		entitynum = 8
-
+		
 		if isscroll:
+			startfrom = int(request.POST['startfrom'])
+			linetype = request.POST['type']
+			entitynum = 8
 			# load 4 more form database
 			if linetype == 'new':
 				objects = Post.objects
@@ -102,8 +102,8 @@ class HomeView(TemplateView):
 			else: # the new list is empty
 				result['loaded'] = False
 
-		else: # not a scroll, tab change event
-			pass
+		else: # not a scroll request, other requests like sidebar
+
 
 		return JsonResponse(result)
 

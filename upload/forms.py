@@ -75,21 +75,5 @@ class JournalForm(forms.ModelForm):
 			'body',
 			'bgimage',
 		]
-	tag_string = forms.CharField(max_length=50,
-		help_text='Split each tag with ,(comma), only Alphabets allowed')
-
-	def __init__(self, *args, **kwargs):
-		super(JournalForm, self).__init__(*args, **kwargs)
-		self.helper = FormHelper()
-
-		self.helper.form_id = 'journal_form'
-		self.helper.attrs = {'role': 'form', 'enctype': 'multipart/form-data'}
-		self.helper.layout = Layout(
-			Field('title', id='title_form', css_class='form-control'),
-			Field('body', id='body_form', css_class='form-control'),
-			Field('tag_string', id='tag_form', css_class='form-control'),
-			Field('bgimage', id='bgimage_form'),
-			Submit('submit', 'Submit', id='submit'),
-		)
-
+	tag_string = forms.CharField(max_length=50)
 

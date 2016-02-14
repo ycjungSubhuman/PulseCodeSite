@@ -2,12 +2,246 @@
 
 {% block title %}Write Journal{% endblock title %}
 
+{% block viewport %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1, user-scalable=0" />
+{% endblock viewport %}
+
+
+{% block style %}
+{{ block.super }}
+{% load static %}
+<link href="{% static 'markdown.css' %}" rel="stylesheet" />
+<style>
+
+	.screen-whole {
+		width: 100%;
+		height: 100%;
+		padding-top: 52px;
+		position: relative;
+		overflow: hidden;
+	}
+	.screen-bottom {
+		width: 100%;
+		height: 100%;
+	}
+	.markdownwriter {
+		width: 100%;
+		height: 100%;
+	}
+	.editor {
+		background-color: #efefef;
+	}
+	.editor-topbar {
+		position: relative;
+		width: 100%;
+		height: 40px;
+		z-index: 5;
+	}
+	.editor-topbar-title {
+		width: 100%;
+		height: 100%;
+		border-bottom: solid 1px #aaaaaa;
+		padding-right: 80px;
+	}
+	.editor-bottom {
+		position: relative;
+		padding-top: 40px;
+		top: -40px;
+		width: 100%;
+		height: 100%;
+		z-index: 0;
+	}
+	.editor-wrapper {
+		width: 100%;
+		height: 100%;
+	}
+	.editor-original {
+		float: left;
+		width: 100%;
+		height: 100%;
+	}
+	.editor-tagbar {
+		position: relative;
+		height: 40px;
+		width: 100%;
+		border-bottom: solid 1px #aaaaaa;
+		z-index: 2;
+	}
+	.editor-body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		padding-top: 40px;
+		top: -40px;
+		z-index: 1;
+	}
+	.editor-textwrapper {
+		width: 100%;
+		height: 100%;
+	}
+	.editor-textarea {
+		width: 100%;
+		height: 100%;
+		border: 0;
+		color: black;
+		padding: 10px;
+	}
+	.editor-textarea-small {
+		font-size: 15pt;
+		overflow: hidden;
+	}
+	[role="original"] {
+		font-size: 11pt;
+		font-family: consolas;
+	}
+	[role="submit"] {
+		width: 80px;
+		height: 100%;
+		float: right;
+		position: relative;
+		top: -40px;
+		border-radius: 0;
+	}
+	.editor-preview {
+		float: right;
+		width: 50%;
+		height: 100%;
+		border-left: solid 1px #aaaaaa;
+		padding: 5px;
+	}
+	.editor-preview .previewtext{
+		margin-top: 5px;
+		color: #aaaaaa;
+		font-size: 12pt;
+		margin-bottom: 20px;
+	}
+	.editor-preview-body {
+		width: 100%;
+		height: 100%;
+		color: black;
+		padding: 10px;
+		padding-top: 20px;
+	}
+	.trackbutton {
+		float: right;
+		margin-left: 10px;
+	}
+	[role="track-off"] {
+		background-color: #3333aa;
+	}
+	[role="render"] {
+		background-color: #44d333;
+	}
+
+	@media all and (min-width:768px){
+		.editor-original{
+			width: 50%;
+		}
+	}
+
+</style>
+{% endblock style %}
+
 {% block content %}
-	<div class="panel panel-default">
-		<div class="panel-heading">Write Journal</div>
-		<div class="panel-body">
-			{% load crispy_forms_tags %}
-			{% crispy form %}
-		</div>
+<div class="screen-whole">
+	<div class="screen-bottom">
+		<form class="markdownwriter" role="markdownwriter" method="post" action="{% url 'upload:journal' %}">
+			{% csrf_token %}
+			<div class="editor editor-topbar">
+				<div class="editor-topbar-title">
+					<textarea name="title" class="editor editor-textarea editor-textarea-small" role="title"></textarea>
+				</div>
+				<input type="submit" tabindex=5 class="btn btn-default" role="submit" value="Submit" />
+			</div>
+			<div class="editor editor-bottom">
+				<div class="editor editor-wrapper">
+					<div class="editor editor-original">
+						<div class="editor editor-tagbar">
+							<textarea name="tagstring" class="editor editor-textarea editor-textarea-small" role="tags"></textarea>
+						</div>
+						<div class="editor editor-body">
+							<div class="editor editor-textwrapper">
+								<textarea name="body" class="editor editor-textarea" role="original"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="editor-preview hidden-xs">
+						<span class="previewtext">Preview</span>
+						<button type="button" class="btn btn-default trackbutton" role="track-off">Realtime Tracking...Click to turn off</button>
+						<button type="button" class="btn btn-default trackbutton" role="track-on">Tracking Off. Click to turn on</button>
+						<button type="button" class="btn btn-default trackbutton" role="render">Render</button>
+						<div class="editor-preview-body markdown-body" role="markdown">
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
 	</div>
+</div>
 {% endblock content %}
+
+{% block script %}
+{{ block.super }}
+<script>
+	$(document).ready(function(){
+		var converter = new showdown.Converter({extensions: ['youtube']});
+		var tracking = true;
+		//track button setting
+		$('[role="render"]').hide();
+		$('[role="track-on"]').hide();
+
+		$('[role="track-off"]').click(function(){
+			tracking = false;
+			$(this).hide();
+			$('[role="render"]').show();
+			$('[role="track-on"]').show();
+		});
+		$('[role="track-on"]').click(function(){
+			$('[role="render"]').hide();
+			$(this).hide();
+			$('[role="track-off"]').show();
+			tracking = true;
+			$('[role="markdown"]').html(converter.makeHtml($('[role="original"]').val()));
+		});
+		$('[role="render"]').click(function(){
+			$('[role="markdown"]').html(converter.makeHtml($('[role="original"]').val()));
+		})
+
+		//ghost hits
+		$('[role="title"]').watermark('제목을 입력하세요.');
+		$('[role="tags"]').watermark('태그: 최소 1개, 영문자만가능, 쉼표로 구분');
+		$('[role="original"]').watermark('Markdown으로 작성');
+
+		//realtime markdown preview
+		$('[role="original"]').on('keydown keypress keyup', function(e){
+			if(tracking)
+				$('[role="markdown"]').html(converter.makeHtml($(this).val()));
+		})
+
+		$(document).on('keydown', '[role="original"]', function(e){
+			var keyCode = e.keyCode || e.which;
+
+			//referenced from http://stackoverflow.com/a/6637396
+			if(keyCode == 9){ //tab
+				e.preventDefault();
+				var start = $(this).get(0).selectionStart;
+				var end = $(this).get(0).selectionEnd;
+
+			    // set textarea value to: text before caret + tab + text after caret
+			    $(this).val($(this).val().substring(0, start)
+			    	+ "\t"
+			    	+ $(this).val().substring(end));
+
+			    // put caret at right position again
+			    $(this).get(0).selectionStart =
+			    $(this).get(0).selectionEnd = start + 1;
+			}
+		});
+
+	});
+</script>
+
+<script src="{% static 'watermark3.1.4/jquery.watermark.min.js' %}"></script>
+<script src="{% static 'showdown/showdown.min.js' %}"></script>
+<script src="{% static 'showdown/showdown-youtube.min.js' %}"></script>
+{% endblock script %}

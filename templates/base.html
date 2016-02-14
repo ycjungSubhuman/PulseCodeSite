@@ -2,7 +2,9 @@
 <html lang="ko">
 <head>
 	<meta charset="utf-8">
+{% block viewport %}
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+{% endblock viewport %}
 	<title>{% block title %}Pulse Code{% endblock title %}</title>
 
 {% load static %}
@@ -82,6 +84,7 @@
 	<script src="{% static "jquery2.2.0/jquery-2.2.0.min.js" %}"></script>
 	<script src="{% static "bootstrap3.3.6/js/bootstrap.min.js" %}"></script>
 	<script src="{% static "integer.js" %}"></script>
+	<script src="{% static "smallplayer.js" %}"></script>
 	{% block script %}
 	{% endblock script %}
 </body>
