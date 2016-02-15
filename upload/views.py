@@ -61,55 +61,40 @@ class TrackUploadFormView(FormView):
 
 		return super(TrackUploadFormView, self).form_valid(form)
 
-class JournalWriteView(TemplateView):
+class JournalWriteView(FormView):
 	template_name = 'upload/write.html'
+	form_class = JournalForm
 
-	def post(self, request):
+	def form_valid(self, form):
 		"""fill in the fields
 
 			title, author, body, bgimage, tag
 		"""
-		print 'enteredjournal'
 		journal = Journal()
 
 		# - title
-		journal.title = request.POST['title']
+		journal.title = form.cleaned_data['title']
 
 		try:
 			# - author
-			journal.author = get_object_or_404(Member, user=request.user)
+			journal.author = get_object_or_404(Member, user=self.request.user)
 		except:
-			return HttpResponse('<p>You are not authorized. Please login.')
+			return HttpResponse('<p>You are not authorized. Please login.</p>')
 			
 		# - body
-		journal.body = request.POST['body']
+		journal.body = form.cleaned_data['body']
+		print journal.body
 
 		# - bgimage
-		journal.bgimage = request.FILES['bgimage']
+		journal.bgimage = self.request.FILES['bgimage']
 
 		journal.save()
 
-		tag_string = request.POST['tag_string']
+		tag_string = form.cleaned_data['tag_string']
 		addFromRawTagstring(journal, tag_string)
 
 		return HttpResponseRedirect(reverse('home:home'));
 
-	def is_valid(self, request):
-		# - check the size of Image
-		size_image = self.cleaned_data['image'].size
-		if size_image > 2*1024*1024: # 2MiB
-			self._errors['image_exceed'] = 'Image size exceeds 2MiB'
-			return False
-
-		# - tag format test --- all should be alphabet
-		tags = self.cleaned_data['tag_string'].split(',')
-		tags[:] = [tag.strip() for tag in tags]
-		for tag in tags:
-			if not tag.isalpha():
-				return False
-
-		# - test all-passed
-		return True	
 
 class ImageUpload(View):
 	def post(self, request):

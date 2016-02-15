@@ -87,7 +87,7 @@
 		padding: 10px;
 	}
 	.editor-textarea-small {
-		font-size: 15pt;
+		font-size: 12pt;
 		overflow: hidden;
 	}
 	[role="original"] {
@@ -153,6 +153,14 @@
 		margin: auto;
 		margin-top: 10px;
 	}
+	.message-error {
+		position: absolute;
+		color: red;
+		top: 0;
+		left: 0;
+		width: 100%;
+		font-size: 7pt;
+	}
 
 	@media all and (min-width:768px){
 		.editor-original{
@@ -164,13 +172,17 @@
 {% endblock style %}
 
 {% block content %}
+{% load myfilters %}
 <div class="screen-whole">
 	<div class="screen-bottom">
 		<form class="markdownwriter" role="markdownwriter" method="post" action="{% url 'upload:journal' %}" enctype="multipart/form-data">
 			{% csrf_token %}
 			<div class="editor editor-topbar">
+				<div class="message-error">
+					{{ form.title.errors }}
+				</div>
 				<div class="editor-topbar-title">
-					<textarea name="title" class="editor editor-textarea editor-textarea-small" role="title"></textarea>
+					{{ form.title|addclass_role:'editor editor-textarea editor-textarea-small,title' }}
 				</div>
 				<button type="button" tabindex=5 class="btn btn-default" data-toggle="modal" data-target="#bgimagesubmit" role="submit">Next</button>
 			</div>
@@ -178,11 +190,20 @@
 				<div class="editor editor-wrapper">
 					<div class="editor editor-original">
 						<div class="editor editor-tagbar">
-							<textarea name="tag_string" class="editor editor-textarea editor-textarea-small" role="tags"></textarea>
+							<div class="message-error">
+								{{ form.tag_string.errors }}
+							</div>
+							{{ form.tag_string|addclass_role:"editor editor-textarea editor-textarea-small,tags" }}
 						</div>
 						<div class="editor editor-body">
 							<div class="editor editor-textwrapper">
-								<textarea name="body" class="editor editor-textarea" role="original"></textarea>
+								<div style="position:relative;">
+									<div class="message-error">
+										{{ form.body.errors }}
+										{{ form.bgimage.errors}}
+									</div>
+								</div>
+								{{ form.body|addclass_role:'editor editor-textarea,original' }}
 							</div>
 						</div>
 					</div>
@@ -207,7 +228,7 @@
 							</div>
 							<div class="fileUpload btn btn-default">
 								<span>Select Image</span>
-								<input type="file" name="bgimage" class="upload" role="bgimage" value="File"/>
+								{{ form.bgimage|addclass_role:'upload,bgimage' }}
 							</div>
 							<input type="submit" class="btn btn-default button-submit" value="Finish" />
 						</div>
