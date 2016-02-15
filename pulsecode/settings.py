@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'achievement',
     'posting',
     'markdown',
+    'audiotools',
 ]
 
 MIDDLEWARE_CLASSES = [

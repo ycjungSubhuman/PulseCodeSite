@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 
 from django.db import models
@@ -46,12 +48,13 @@ class Track(Post):
 	#data
 	allow_tags = True
 	audio_file = models.FileField(upload_to='uploads/tracks/converted/%Y/%m/%d/',
-		help_text='A track should be smaller than 10MiB')
+		help_text=u'트랙은 10MiB 미만으로 올려주세요.')
 
 	image = models.ImageField(upload_to='uploads/images/%Y/%m/%d', 
-		help_text='Image should be smaller than 2MiB')
+		help_text=u'배경으로 쓰일 이미지입니다. 2MiB 미만의 이미지만 올려주세요.')
 
-	description = models.CharField(max_length=140)
+	description = models.CharField(max_length=140, 
+		help_text='트랙에 대한 간단한 설명을 써주세요.')
 	datetime = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):

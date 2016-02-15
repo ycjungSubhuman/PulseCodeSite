@@ -26,6 +26,7 @@ def addFromRawTagstring(modelinst, tagstring):
 class TrackUploadFormView(FormView):
 	template_name = 'upload/upload.html'
 	form_class = TrackUploadForm
+	success_url = '/home/'
 
 	def form_valid(self, form):
 		""" fill in the fields

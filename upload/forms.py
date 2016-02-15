@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from django import forms
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.conf import settings
 from django.forms.utils import ValidationError
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Button, Div, Field, Submit
 from posting.models import Track, Journal
+import audiotools
+import os
+import time
+import random
+import string
 
 class TrackUploadForm(forms.ModelForm):
 	class Meta:
@@ -15,9 +23,8 @@ class TrackUploadForm(forms.ModelForm):
 			'image',
 			'description',
 		]
-	audio_file = forms.FileField()
 	tag_string = forms.CharField(max_length=50,
-		help_text='Split each tag with ,(comma), only Alphabets allowed')
+		help_text=u'태그: 최소 1개, 영문자만가능, 쉼표로 구분')
 
 	def __init__(self, *args, **kwargs):
 		super(TrackUploadForm, self).__init__(*args, **kwargs)
@@ -42,32 +49,56 @@ class TrackUploadForm(forms.ModelForm):
 		self.fields['description'].widget = forms.Textarea()
 		self.fields['tag_string'].label = 'Tags'
 
-	def is_valid(self):
-		valid = super(TrackUploadForm, self).is_valid()
+	error_messages = {
+		'tag_invalid': u'태그가 형식에 맞지 않습니다.',
+		'image_exceed': u'이미지가 2MiB를 넘어갑니다. 더 작은 이미지를 선택해주세요.',
+		'audio_exceed': u'트랙의 크기가 너무 틉니다.',
+		'audio_invalid': u'지원하지 않는 오디오 형식입니다. mp3나 ogg를 올려주세요.',
+		'audio_corrupted': u'올바르지 않거나 손상된 오디오 파일입니다.',
+	}
+	def clean_audio_file(self):
+		audio = self.cleaned_data['audio_file']
+		if audio.size > 10*1024*1024:
+			raise ValidationError(self.error_messages['audio_exceed'])
 
-		# - super() test
-		if not valid:
-			self._errors['super_fail'] = 'super validation false'
-			return False
+		allowed_type = ['audio/mpeg', 'audio/ogg', 'audio/mp3']
+		if not (audio.content_type in allowed_type):
+			raise ValidationError(self.error_messages['audio_invalid'])
 
-		# - the size of track is checked in ajax POST handler
-		# 	Pass
+		randomfilename = str(time.time())+''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+		path = default_storage.save('tmp/'+randomfilename, ContentFile(audio.read()))
+		try:
+			audiotools.open(os.path.join(settings.MEDIA_ROOT, path))
+			default_storage.delete('tmp/'+randomfilename)
+		except audiotools.UnsupportedFile:
+			default_storage.delete('tmp/'+randomfilename)
+			raise ValidationError(self.error_messages['audio_corrupted'])
 
-		# - check the size of Image
-		size_image = self.cleaned_data['image'].size
-		if size_image > 2*1024*1024: # 2MiB
-			self._errors['image_exceed'] = 'Image size exceeds 2MiB'
-			return False
+		return audio
 
-		# - tag format test --- all should be alphabet
+
+
+
+
+	def clean_tag_string(self):
 		tags = self.cleaned_data['tag_string'].split(',')
 		tags[:] = [tag.strip() for tag in tags]
 		for tag in tags:
 			if not tag.isalpha():
-				return False
+				print 'tag'
+				raise ValidationError(self.error_messages['tag_invalid'])
+			try:
+				tag.decode()
+			except UnicodeEncodeError:
+				raise ValidationError(self.error_messages['tag_invalid'])
+		return self.cleaned_data['tag_string']
 
-		# - test all-passed
-		return True
+	def clean_image(self):
+		size_image = self.cleaned_data['image'].size
+		if size_image > 2*1024*1024: # 2MiB
+			raise ValidationError(self.error_messages['image_exceed'])
+		return self.cleaned_data['image']
+
 
 class JournalForm(forms.ModelForm):
 	class Meta:
