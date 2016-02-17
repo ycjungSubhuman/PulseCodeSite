@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^write/', JournalWriteView.as_view(), name='write'),
     url(r'^markdown/', include('django_markdown.urls')),
     url(r'^home/', include('home.urls', namespace='home')),
+    url(r'^posting/', include('posting.urls', namespace='posting')),
 #url(r'^register/', include('register.urls', namespace='register')),
 ]
 

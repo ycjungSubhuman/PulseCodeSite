@@ -55,6 +55,7 @@
 					dom_entity = $('<li></li>', {
 						class: 'entity',
 						id: 'entity'+startfrom+i,
+						role: 'entity',
 					});
 
 					//layouting
@@ -84,8 +85,11 @@
 					var header_title = $('<a></a>', {
 						href: '/'+data.entity[i].objtype+'/'+data.entity[i].author+'/'+data.entity[i].title,
 					}).html('<p class="header header-title"><span>'+data.entity[i].title+'</span></p>');
+					var header_pk = $('<input></input>', {
+						role: 'pk',
+					}).val(data.entity[i].pk).hide();
 
-					dom_header.append(header_author).append(header_title);
+					dom_header.append(header_author).append(header_title).append(header_pk);
 					//tags
 					for(var tag_index in data.entity[i].tag){
 						var tagspan = $('<a></a>', {
@@ -98,22 +102,22 @@
 					//comment/like/scrap
 					var comment_button = $('<button></button>', {
 						class: 'btn btn-default entitybutton entitybutton-comment',
-						id: dom_entity.attr('id')+'-comment',
 						title: 'View comments',
+						role: 'comment',
 					}).html('<span class="glyphicon glyphicon-comment"></span>'+'<span>'+data.entity[i].comment_num+'</span>');
 					var like_button = $('<button></button>', {
 						class: 'btn btn-default entitybutton entitybutton-rightopen entitybutton-like',
-						id: dom_entity.attr('id')+'-like',
 						title: 'Like',
+						role: 'like',
 					}).html('<span class="glyphicon glyphicon-heart"></span>'+'<span>'+data.entity[i].liked_num+'</span>');
+					if(data.entity[i].liked_on) like_button.css('color', '#ff6666');
 					var scrap_button = $('<button></button>', {
 						class: 'btn btn-default entitybutton entitybutton-leftopen entitybutton-scrap',
-						id: dom_entity.attr('id')+'-like',
 						title: 'Scrap',
+						role: 'scrap',
 					}).html('<span class="glyphicon glyphicon-star"></span>');
+					if(data.entity[i].scraped_on) scrap_button.css('color', '#ffc400');
 
-					$('.entitybutton').attr("data-toggle", "tooltip");
-					$('[data-toggle="tooltip"]').tooltip();
 					dom_footer.append(scrap_button).append(like_button).append(comment_button);
 
 					//add propercss class
@@ -224,6 +228,7 @@
 		});
 
 		//on load, get 8 entities from the server
+		$('#start_from').val(0);
 		getTimeline()
 		$(window).scroll(function(e){//scroll loading event
 			if(do_getResult){
@@ -242,6 +247,45 @@
 		 		'height': height_content,
 		 		'top': '-'+height_content,
 		 	});
+		});
+
+		//like/scrap button 
+		$(document).on('click', '[role="like"]', function(e){
+			$.ajax({
+				type: 'POST',
+				url: "{% url 'posting:like' %}",
+				data: {
+					post_pk: $(e.target).parents('[role="entity"]').find('[role="pk"]').val(),
+				},
+				success: function(data){
+					if(data.error){
+						console.log(data.error);
+					}
+					else{
+						$(e.target).parents('[role="entity"]').find('[role="like"] span:last-child').text(data.like_num);
+						if(data.on == true) $(e.target).parents('[role="entity"]').find('[role="like"]').css('color', '#ff6666');
+						else $(e.target).parent().parents('[role="entity"]').find('[role="like"]').css('color', '#ffffff');
+					}
+				}
+			});
+		});
+		$(document).on('click', '[role="scrap"]', function(e){
+			$.ajax({
+				type: 'POST',
+				url: "{% url 'posting:scrap' %}",
+				data: {
+					post_pk: $(e.target).parents('[role="entity"]').find('[role="pk"]').val(),
+				},
+				success: function(data){
+					if(data.error){
+						console.log(data.error);
+					}
+					else{
+						if(data.on == true) $(e.target).parents('[role="entity"]').find('[role="scrap"]').css('color', '#ffc400');
+						else $(e.target).parent().parents('[role="entity"]').find('[role="scrap"]').css('color', '#ffffff');
+					}
+				}
+			});
 		});
 	});	
 </script>	

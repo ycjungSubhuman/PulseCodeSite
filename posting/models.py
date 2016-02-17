@@ -71,6 +71,8 @@ class Comment(models.Model):
 	post = models.ForeignKey(Post, related_name='comment', on_delete=models.CASCADE)
 	text = models.CharField(max_length=140)
 
+	def __unicode__(self):
+		return self.text
 
 @receiver(models.signals.post_delete, sender=Track)
 def delete_file_on_model_delete(sender, instance, **kwargs):

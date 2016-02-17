@@ -46,16 +46,20 @@ class HomeView(TemplateView):
 				for idx, obj in enumerate(new8):
 					objtype = 'track' if hasattr(obj, 'track') else 'journal'
 					taglist = []
-					liked_member = []
-					scraped_member = []
+					liked_user = []
+					scraped_user = []
 					for tag in obj.tag.all()[:3]:
 						taglist.append(tag.name)
 
 					for liked in obj.liked_member.all():
-						liked_member.append(liked.user.username)
+						liked_user.append(liked.user)
+
+					liked_on = request.user in liked_user
 
 					for scraped in obj.scraped_member.all():
-						scraped_member.append(scraped.user.username)
+						scraped_user.append(scraped.user)
+
+					scraped_on = request.user in scraped_user
 
 					# common factors
 					result['entity'].append({})
@@ -65,12 +69,13 @@ class HomeView(TemplateView):
 						'title': obj.title,
 						'author': obj.author.name,
 						'tag': taglist,
-						'liked_member': liked_member,
-						'liked_num': len(liked_member),
-						'scraped_member': scraped_member,
-						'scraped_num': len(scraped_member),
+						'liked_num': len(liked_user),
+						'liked_on': liked_on,
+						'scraped_num': len(scraped_user),
+						'scraped_on': scraped_on,
 						'comment_num': len(obj.comment.all()),
-						'bgimage_url': obj.track.image.url if objtype=='track' else obj.journal.bgimage.url
+						'bgimage_url': obj.track.image.url if objtype=='track' else obj.journal.bgimage.url,
+						'pk': obj.pk,
 					}
 					# track specific
 					if objtype is 'track':

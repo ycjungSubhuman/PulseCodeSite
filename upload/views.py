@@ -6,7 +6,7 @@ from upload.forms import TrackUploadForm, JournalForm
 from posting.models import Track, Member, Tag, Journal
 from upload.models import Image
 from django.core.exceptions import PermissionDenied
-from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 
 def addFromRawTagstring(modelinst, tagstring):
 	tags = tagstring.split(',')
@@ -78,9 +78,9 @@ class JournalWriteView(FormView):
 
 		try:
 			# - author
-			journal.author = get_object_or_404(Member, user=self.request.user)
+			journal.author = Member.objects.get(user=self.request.user)
 		except:
-			return HttpResponse('<p>You are not authorized. Please login.</p>')
+			return HttpResponseForbidden('<h1>GEEEEEEEEET<br />DUNKEDONNNNNNNNNNN(403)<br /></h1><p>forbidden. please login.')
 			
 		# - body
 		journal.body = form.cleaned_data['body']
