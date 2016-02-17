@@ -93,10 +93,14 @@
 }
 .header {
 	overflow: hidden;
-	text-overflow: ellipsis;
+	display: block;
 	color: white;
+	word-break: keep-all;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 .header span{
+	overflow: hidden;
 	background-color: #000000;
 	color: white;
 	opacity: 1;

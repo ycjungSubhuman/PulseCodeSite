@@ -24,10 +24,9 @@ urlpatterns = [
 	url(r'^login/', include('login.urls', namespace='login')),
 	url(r'^upload/', include('upload.urls', namespace='upload')),
     url(r'^logout/', user_logout, name='logout'),
-    url(r'^write/', JournalWriteView.as_view(), name='write'),
-    url(r'^markdown/', include('django_markdown.urls')),
     url(r'^home/', include('home.urls', namespace='home')),
     url(r'^posting/', include('posting.urls', namespace='posting')),
 #url(r'^register/', include('register.urls', namespace='register')),
+
 ]
 
