@@ -79,12 +79,12 @@
 					dom_entity.append(dom_background).appendTo('#linefeed');
 
 					//---header: add author, title, and tag
-					var header_author = $('<a></a>', {
+					var header_author = $('<div></div>', {
 						href: '/user/'+data.entity[i].author,
-					}).html('<p class="header header-author"><span>'+data.entity[i].author+'</span></p>');
-					var header_title = $('<a></a>', {
+					}).html('<a class="header header-author"><span>'+data.entity[i].author+'</span></a>');
+					var header_title = $('<div></div>', {
 						href: '/'+data.entity[i].objtype+'/'+data.entity[i].author+'/'+data.entity[i].title,
-					}).html('<p class="header header-title"><span>'+data.entity[i].title+'</span></p>');
+					}).html('<a class="header header-title"><span>'+data.entity[i].title+'</span></a>');
 					var header_pk = $('<input></input>', {
 						role: 'pk',
 					}).val(data.entity[i].pk).hide();
