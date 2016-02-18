@@ -7,6 +7,7 @@ $(document).ready(function(){
 		$(this).parent().find('.entity-player-small').show();
 		$(this).parent().find('audio').load();
 		$(this).parent().find('audio').trigger('audio:play');
+		$(this).parents('[role="entity"]').find('[role="comment"]').fadeIn();
 
 		//event firing
 		audio[0].loaded_updator = setInterval(function(){

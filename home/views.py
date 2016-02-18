@@ -19,13 +19,13 @@ class HomeView(TemplateView):
 				objects = Post.objects
 			elif linetype == 'liked':
 				try:
-					user = Member.get(user=request.user)
+					user = Member.objects.get(user=request.user)
 					objects = user.liked_post
 				except Member.DoesNotExist:
 					objects = None
 			elif linetype == 'scraped':
 				try:
-					user = Member.get(user=request.user)
+					user = Member.objects.get(user=request.user)
 					objects = user.scraped_post
 				except Member.DoesNotExist:
 					objects = None

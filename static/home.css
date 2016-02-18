@@ -16,8 +16,8 @@
 	list-style-type: none;
 }
 .entity {
+	position: relative;
 	background-color: #111111;
-	height: 250px;
 	margin: 20px;
 	margin-top: 25px;
 	margin-bottom: 25px;
@@ -27,7 +27,7 @@
 	background-position: center center;
 	background-size: 150%;
 	width: 100%;
-	height: 100%;
+	height: 250px;
 	margin: 0;
 	padding: 10px 10px 10px 10px;
 	position: relative;
@@ -90,6 +90,25 @@
 }
 .entitybutton-scrap:hover{
 	border-left: solid 1px #222222;
+}
+.commentsection {
+	width: 100%;
+    box-sizing: border-box;
+     -webkit-box-sizing:border-box;
+     -moz-box-sizing: border-box;
+	margin-top: 0px;
+	padding: 10px;
+	height: 500px;
+	background-color: #ffffff;
+}
+.commentinput {
+	width: 100%;
+    box-sizing: border-box;
+     -webkit-box-sizing:border-box;
+     -moz-box-sizing: border-box;
+	font-size: 12px;
+	font-family: sans-serif;
+	color: black;
 }
 .header {
 	overflow: hidden;

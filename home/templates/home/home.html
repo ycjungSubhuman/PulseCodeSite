@@ -1,11 +1,15 @@
 {% extends "base_sidebar.html" %}
 
+{% block viewport %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1, user-scalable=0" />
+{% endblock viewport %}
+
 {% block scrollbar %}
 	<div class="navbar navbar-inverse" id='typetab' role="navigation">
 		<ul class="nav">
-			<li id="new" style="font-weight:bold;"><a href="#">New</a></li>
-			<li id="liked"><a href="#">Liked</a></li>
-			<li id="scraped"><a href="#">Scraped</a></li>
+			<li id="new" style="font-weight:bold;"><a href="#" role="list_new">New</a></li>
+			<li id="liked"><a href="#" role="list_liked">Liked</a></li>
+			<li id="scraped"><a href="#" role="list_scraped">Scraped</a></li>
 		</ul>
 	</div>
 	<div id="main">
@@ -18,8 +22,9 @@
 {% block content %}
 <span hidden>{{ csrf_token }}</span>
 {{ block.super }}
-	<input id="start_from" value="0" hidden/>
-	<input id="type" value="new" hidden/>
+	<input id="start_from" value="0" hidden />
+	<input id="type" value="new" hidden />
+	<input id="last_position" value="0" hidden />
 {% endblock content %}
 
 
@@ -35,6 +40,9 @@
 {{ block.super }}
 <script>
 	var do_getResult = false;//stops from multiple POST call
+	var dom_new;
+	var dom_liked;
+	var dom_scraped;
 	function getTimeline(){
 
 		//get where to start
@@ -74,9 +82,14 @@
 						class: 'entitysection-footer',
 						id: dom_entity.attr('id')+'-footer',
 					});
+					var dom_comment = $('<div></div>', {
+						class: 'commentsection',
+						role: 'commentsection',
+					});
 					dom_background.append(dom_backcontainer);
 					dom_backcontainer.append(dom_header).append(dom_footer);
 					dom_entity.append(dom_background).appendTo('#linefeed');
+					dom_entity.append(dom_comment);
 
 					//---header: add author, title, and tag
 					var header_author = $('<div></div>', {
@@ -104,7 +117,7 @@
 						class: 'btn btn-default entitybutton entitybutton-comment',
 						title: 'View comments',
 						role: 'comment',
-					}).html('<span class="glyphicon glyphicon-comment"></span>'+'<span>'+data.entity[i].comment_num+'</span>');
+					}).html('<span class="glyphicon glyphicon-comment"></span>'+'<span>'+data.entity[i].comment_num+'</span>').hide();
 					var like_button = $('<button></button>', {
 						class: 'btn btn-default entitybutton entitybutton-rightopen entitybutton-like',
 						title: 'Like',
@@ -119,6 +132,13 @@
 					if(data.entity[i].scraped_on) scrap_button.css('color', '#ffc400');
 
 					dom_footer.append(scrap_button).append(like_button).append(comment_button);
+
+					//commentsection
+					/*var comment_input = $('<input></input>', {
+						class: 'commentinput',
+						role: 'commentinput', 
+					}).appendTo(dom_comment);
+					$(comment_input).watermark('코멘트를 입력하세요.');*/
 
 					//add propercss class
 					if(data.entity[i].objtype == 'journal'){
@@ -287,6 +307,41 @@
 				}
 			});
 		});
+		// tab switch
+		$('[role="list_new"]').click(function(){
+			if($('#type').val() == 'new') return;
+			else{
+				$('#linefeed').empty();
+				$('#start_from').val(0);
+				$('#type').val('new');
+				getTimeline();
+			}
+
+		});
+		$('[role="list_liked"]').click(function(){
+			if($('#type').val() == 'liked') return;
+			else{
+				$('#linefeed').empty();
+				$('#type').val('liked');
+				$('#start_from').val(0);
+				getTimeline();
+			}
+		});
+		$('[role="list_scraped"]').click(function(){
+			if($('#type').val() == 'scraped') return;
+			else{
+				$('#linefeed').empty();
+				$('#type').val('scraped');
+				$('#start_from').val(0);
+				getTimeline();
+			}
+		});
+
+		//comment
+
+
 	});	
 </script>	
+
+<script src="{% static 'watermark3.1.4/jquery.watermark.min.js' %}"></script>
 {% endblock script %}
