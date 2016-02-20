@@ -8,6 +8,7 @@ $(document).ready(function(){
 		$(this).parent().find('audio').load();
 		$(this).parent().find('audio').trigger('audio:play');
 		$(this).parents('[role="entity"]').find('[role="comment"]').fadeIn();
+		$(this).parents('[role="entity"]').find('[role="description"]').slideDown();
 
 		//event firing
 		audio[0].loaded_updator = setInterval(function(){

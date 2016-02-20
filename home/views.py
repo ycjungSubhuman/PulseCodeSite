@@ -88,14 +88,6 @@ class HomeView(TemplateView):
 						entity['bgimage_url'] = track.image.url
 						entity['description'] = track.description
 						datetime = track.datetime
-						entity['datetime'] = {
-							'year': datetime.year,
-							'month': datetime.month,
-							'day': datetime.day,
-							'hour': datetime.hour,
-							'minute': datetime.minute,
-							'second': datetime.second,
-						}
 					#journal specific
 					else :
 						entity = result['entity'][idx]

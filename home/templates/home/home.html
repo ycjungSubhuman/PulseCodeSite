@@ -85,7 +85,7 @@
 					var dom_comment = $('<div></div>', {
 						class: 'commentsection',
 						role: 'commentsection',
-					});
+					}).hide();
 					dom_background.append(dom_backcontainer);
 					dom_backcontainer.append(dom_header).append(dom_footer);
 					dom_entity.append(dom_background).appendTo('#linefeed');
@@ -132,15 +132,37 @@
 					if(data.entity[i].scraped_on) scrap_button.css('color', '#ffc400');
 
 					dom_footer.append(scrap_button).append(like_button).append(comment_button);
+					// ---description
+					var description = $('<div></div>', {
+						class: 'description',
+						role: 'description',
+					}).hide();
 
-					//commentsection
-					/*var comment_input = $('<input></input>', {
+					dom_background.after(description);
+
+					if(data.entity[i].objtype == 'track'){
+						description.text(data.entity[i].track.description);
+					}
+
+					// --- comment section
+					var comment_input = $('<textarea></textarea>', {
 						class: 'commentinput',
+						rows: 1,
+						cols: 10,
 						role: 'commentinput', 
 					}).appendTo(dom_comment);
-					$(comment_input).watermark('코멘트를 입력하세요.');*/
+					$(comment_input).watermark('코멘트를 입력하세요.');
+					var comment_wrapper = $('<ul></ul>', {
+						class: 'commentlist commentlist-wrapper',
+						role: 'commentlist',
+					}).appendTo(dom_comment);
+					var comment_pagecount = $('<input></input>', {
+						role: 'commentstartfrom',
+					}).val(0).hide();
 
-					//add propercss class
+					comment_wrapper.after(comment_pagecount);
+
+					//add proper css class
 					if(data.entity[i].objtype == 'journal'){
 						dom_entity.addClass('entity-journal');
 					}
@@ -242,6 +264,76 @@
 			},
 		});
 	}
+	function updateComment(obj){
+	//ajax get comments
+		$.ajax({
+			type: 'POST',
+			url: '{% url "posting:comment" %}',
+			data: {
+				pk: $(obj).parents('[role="entity"]').find('[role="pk"]').val(),
+				commentstartfrom: $(obj).parents('[role="entity"]').find('[role="commentstartfrom"]').val(),
+				body: $(obj).parents('[role="entity"]').find('[role="commentinput"]').val().slice(0, -1),
+			},
+			success: function(data){
+				console.log(data);
+				if(data.error){
+					console.log(data.error);
+				}
+				else{
+					if(data.commented){
+						$(obj).parents('[role="entity"]').find('[role="commentlist"]').empty();
+					}
+					for(var i in data.comment){
+						//comment components
+						var commentli = $('<li></li>', {
+							class: 'commententity',
+							role: 'commententity',
+						});
+						var comment_authorbox = $('<div></div>', {
+							class: 'comment comment-authorbox',
+						});
+						var comment_authorpic = $('<div></div>', {
+							class: 'comment comment-author-pic',
+							role: 'commentauthorpic',
+						}).css('background-image', 'url('+ data.comment[i].imageurl +')');
+						var comment_authorname = $('<div></div>', {
+							class: 'comment comment-author',
+							role: 'commentauthor',
+						}).text(data.comment[i].author);
+						var comment_div = $('<div></div>', {
+							class: 'comment comment-textdiv'
+						});
+						var comment_text = $('<div></div>', {
+							class: 'comment comment-text',
+							role: 'commenttext',
+						}).text(data.comment[i].text);
+
+						//assembly comment components
+						comment_div.append(comment_text);
+						comment_authorbox.append(comment_authorpic).append(comment_authorname);
+						commentli.append(comment_authorbox).append(comment_div);
+						$(obj).parents('[role="entity"]').find('[role="commentlist"]').append(commentli);
+					}
+					if(data.nextup){
+						//add "Load More" button
+						var comment_footer = $('<div></div>', {
+							class: 'comment comment-footer',
+							role: 'commentfooter',
+						});
+						var comment_loadmore = $('<a></a>', {
+							class: 'loadmorecomment',
+							href: '#',
+							role: 'loadmorecomment',
+						}).text('Load more comments');
+						$(obj).parents('[role="entity"]').find('[role="commentfooter"]').remove();
+						comment_footer.append(comment_loadmore);
+						commentli.after(comment_footer);
+					}
+					$(obj).parents('[role="entity"]').find('[role="comment"] span:last-child').text(data.comment_num);
+				}
+			}
+		});
+	}
 	$(document).ready(function(){
 		$.ajaxSetup({
 			headers: {'X-CSRFToken': getCookie("csrftoken")}
@@ -339,6 +431,45 @@
 
 		//comment
 
+		$(document).on('click', '[role="comment"]', function(e){
+			var visible = $(this).parents('[role="entity"]').find('[role="commentsection"]').is(":visible");
+			$(this).parents('[role="entity"]').find('[role="commentsection"]').slideToggle();
+			var commentstart = $(this).parents('[role="entity"]').find('[role="commentstartfrom"]');
+			if(!visible){
+				updateComment(this);
+				commentstart.val(Number(commentstart.val())+3);
+			}
+			else{
+				commentstart.val(0);
+				$(this).parents('[role="entity"]').find('[role="commentlist"]').empty();
+			}
+
+		});
+		// auto adjust the height of comment text
+		$(document).on( 'keyup', '[role="commentinput"]', function (e){
+		    var keyCode = e.keyCode || e.which;
+		    if(keyCode == 13 && e.ctrlKey){
+		    	e.preventDefault();
+		    	$(this).val($(this).val()+'\n');
+		    }
+		    else if(keyCode == 13){
+		    	e.preventDefault();
+		    	//initiallize startfrom
+				var commentstart = $(this).parents('[role="entity"]').find('[role="commentstartfrom"]');
+				commentstart.val(0);
+				//empty
+		    	updateComment(this);
+		    	$(this).val('');
+		    }
+		    $(this).height( 0 );
+		    $(this).height( this.scrollHeight );
+		});
+		$(document).on('click', '[role="loadmorecomment"]', function(e){
+			e.preventDefault();
+			updateComment(this);
+			$('[role="commentstartfrom"]').val(Number($('[role="commentstartfrom"]').val())+3);
+			$(this).parent().hide();
+		})
 
 	});	
 </script>	

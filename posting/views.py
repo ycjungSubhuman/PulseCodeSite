@@ -58,48 +58,50 @@ def scrap(request):
 		result['scrap_num'] = len(post.scraped_member.all())
 		return JsonResponse(result)
 
-def comment(request, pk):
+def comment(request):
 	if request.method == 'POST':
-		result = {'error': None}
-		post_pk = pk
-		body = request.POST['body']
+		result = {'error': None, 'comment': [], 'nextup': False, 'commented': False}
+		post_pk = request.POST['pk']
+		body = request.POST.get('body', '')[:140]
+		commentstartfrom = int(request.POST['commentstartfrom'])
 
-		if len(body)==0:
-			result['error']='BodyEmpty'
-			return JsonResponse(result)
-
+		# get post
 		try:
 			post = Post.objects.get(pk=post_pk)
 		except Post.DoesNotExist:
 			result['error']='PostNotFound'
 			return JsonResponse(result)
 
-		try:
-			member = Member.objects.get(user=request.user)
-		except Member.DoesNotExist:
-			result['error']='UserNotFound'
-			return JsonResponse(result)
 
-		comment = Comment()
-		comment.author = member
-		comment.post = post
-		comment.text = body
-		comment.save()
+		if len(body) != 0: # adding comment
+			if(request.user.is_authenticated()):
+				try:
+					member = Member.objects.get(user=request.user)
+				except Member.DoesNotExist:
+					result['error']='UserNotFound'
+					return JsonResponse(result)
+			else:
+				result['error']='UserNotAuthenticated'
+				return JsonResponse(result)
 
-		return JsonResponse(result)
+			comment = Comment()
+			comment.author = member
+			comment.post = post
+			comment.text = body
+			comment.save()
+			result['commented'] = True
 
-	if request.method == 'GET':
-		result = {'error': None, 'comment': []}
-		post_pk = pk
-
-		try:
-			post = Post.objects.get(pk=post_pk)
-		except Post.DoesNotExist:
-			result['error']='PostNotFound'
-			return JsonResponse(result)
-
-		for comment in post.comment.all()[::-1]:
-			ele = {'author': comment.author.name, 'text': comment.text, 'image': comment.author.picture.url}
-			result['comment'].append(ele)
+		# - return comment
+		for comment in post.comment.all()[::-1][commentstartfrom:commentstartfrom+3]:
+			imageurl = comment.author.picture.url
+			author = comment.author.name
+			text = comment.text
+			commentdata = {'imageurl': imageurl, 'author': author, 'text': text}
+			
+			result['comment'].append(commentdata)
+			
+		result['comment_num'] = len(post.comment.all())
+		if commentstartfrom+3 < result['comment_num']:
+			result['nextup'] = True
 
 		return JsonResponse(result)
