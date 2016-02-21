@@ -16,7 +16,11 @@
 		border: solid 1px #ffffff;
 		margin-top: 20px;
 	}
-	.form-text {
+	.btn-default {
+		border: solid 1px #ffffff;
+	}
+	.btn-default:hover {
+		border: solid 1px #ffffff;
 	}
 </style>
 
@@ -64,7 +68,9 @@
 								<input class="form-checkbox" name="official" type="checkbox" role="officialmember">정회원으로 가입합니다.</input>
 							</label>
 							<p>정회원은 동아리 명부에 이름이 올라가며, 정기 모임과 세미나에 참가할 수 있고 메일을 받습니다. 또한 카카오톡 톡방에 초대받게 됩니다.</p>
-							<input class="form-control form-text" name="povisid" type="text" role="povisid"/>
+							<div class="form-group">
+								<input class="form-control form-text" name="povisid" type="text" role="povisid"/>
+							</div>
 							<input class="btn btn-default" type="submit" />
 						</div>
 					</div>
@@ -98,10 +104,7 @@
 
 		//form validation - client
 		//-------------------------------username
-		$('input[role="username"]').focusin(function(){
-			username_correct = false;
-		});
-		$('input[role="username"]').focusout(function(){
+		$('input[role="username"]').on('focusin focusout', function(){
 			$.ajax({
 				type: 'POST',
 				url: '{% url "login:username_validation" %}',
@@ -125,10 +128,7 @@
 			});
 		});
 		//------------------------------password
-		$('input[role="password"]').focusin(function(){
-			password_correct = false;
-		});
-		$('input[role="password"]').focusout(function(){
+		$('input[role="password"]').on('focusin focusout', function(){
 			var password_rule=  /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{7,15}$/;
 			if($('input[role="password"]').val().match(password_rule)){
 				password_correct = true;
@@ -143,10 +143,7 @@
 				$('input[role="password"]').parent().find('.glyphicon-remove').show();
 			}
 		});
-		$('input[role="passwordconfirm"]').focusin(function(){
-			password_confirm = false;
-		});
-		$('input[role="passwordconfirm"]').on('keyup', function(){
+		$('input[role="passwordconfirm"]').on('focusin keyup focusout', function(){
 			if($('input[role="password"]').val()==$(this).val()){
 				password_confirm = true;
 				$('input[role="passwordconfirm"]').parent().find('[role="message"]').text('Matched');
