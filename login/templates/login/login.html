@@ -1,22 +1,41 @@
-{% extends "base_navigator.html" %}
+{% extends "base.html" %}
 
 {% block title %} Login {% endblock title %}
+
+{% block viewport %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1, user-scalable=0" />
+{% endblock viewport %}
+
 
 {% block style %}
 {{ block.super }}
 <style>
+	body {
+		background-color: #111111;
+	}
+	.panel {
+		position: relative;
+		display: block;
+		margin: auto;
+		top : 40px;
+		width: 80%;
+		max-width: 700px;
+	}
 	.asteriskField {
 		visibility: hidden;
 	}
 	#div_id_remember_me {
 		margin-left: 18px;
 	}
+	[type="submit"] {
+		margin-top: 15px;
+	}
 </style>
 {% endblock style %}
 
 
 
-{% block content %}
+{% block body %}
 	<div class="panel panel-default">
 		<div class="panel-body">
 			<h1>
@@ -32,7 +51,7 @@
 
 		</div>
 	</div><!--end logindiv-->
-{% endblock content %}
+{% endblock body %}
 
 {% block script %}
 <script>
@@ -57,12 +76,12 @@
 				data: {
 					'username': $('#user_id').val(),
 					'password': $('#user_pass').val(),
-					'remember_me': $('#rememberme').val()
+					'remember_me': $('#rememberme').is(':checked'),
 				},
 				success: function(data){
 					//if success, redirect to home
 					if(data.success == true)
-						document.location.replace('../upload/');
+						document.location.replace('{% url "home:home" %}');
 					else
 						$('#login_alert').html('<strong>'+data.message+'</strong>').slideDown();
 				},

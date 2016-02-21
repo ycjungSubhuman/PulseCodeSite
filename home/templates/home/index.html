@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block viewport %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1, user-scalable=0" />
+{% endblock viewport %}
+
+{% block title %}Welcome to Pulsecode{% endblock title %}
+{% block style %}
+{{ block.super }}
+<style>
+	.panel-signup {
+		background-color: #333333;
+		color: white;
+		padding: 10px;
+		padding-top: 0px;
+		border: solid 1px #ffffff;
+		margin-top: 20px;
+	}
+	.form-text {
+	}
+</style>
+
+{% endblock style %}
+
+
+{% load static %}
+{% block body %}
+	<div class="container">
+		<div id="textbox1" class="row">
+			<div class="col-xs-12 col-sm-6 col-lg-6">
+				<h2>포스텍의 미디/컴퓨터 음악 팬을 위한 동아리</h2>
+				<ul>
+					<li>내가 알고 있는 멋진 아티스트를 알리세요.</li>
+					<li>컴퓨터 음악을 직접 만드는 방법을 배우고, 지식을 공유하세요.</li>
+					<li>내가 작곡한 곡을 올리고 피드백을 받으세요.</li>
+				</ul>
+			</div>
+			<div class="col-xs-12 col-sm-6 col-lg-6">
+				<form method="post" role="form" id="signup_form">
+					<div class="panel panel-default panel-signup">
+						<div class="penel-body">
+							<h3>부담 없이 가입하세요</h3>
+							<p>사이트 가입 후 활동은 자유롭습니다. 둘러보기도 환영합니다.</p>
+							{% csrf_token %}
+							<div class="form-group">
+								<input class="form-control form-text" name="username" type="text" role="username" />
+								<span class="glyphicon glyphicon-ok"></span>
+								<span class="glyphicon glyphicon-remove"></span>
+								<span role="message"></span>
+							</div>
+							<div class="form-group has-success">
+								<input class="form-control form-text" name="password" type="password" role="password" />
+								<span class="glyphicon glyphicon-ok"></span>
+								<span class="glyphicon glyphicon-remove"></span>
+								<span role="message"></span>
+							</div>
+							<div class="form-group">
+								<input class="form-control form-text" type="password" role="passwordconfirm" />
+								<span class="glyphicon glyphicon-ok"></span>
+								<span class="glyphicon glyphicon-remove"></span>
+								<span role="message"></span>
+							</div>
+							<label class="c-input c-checkbox">
+								<input class="form-checkbox" name="official" type="checkbox" role="officialmember">정회원으로 가입합니다.</input>
+							</label>
+							<p>정회원은 동아리 명부에 이름이 올라가며, 정기 모임과 세미나에 참가할 수 있고 메일을 받습니다. 또한 카카오톡 톡방에 초대받게 됩니다.</p>
+							<input class="form-control form-text" name="povisid" type="text" role="povisid"/>
+							<input class="btn btn-default" type="submit" />
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-3">
+			</div>
+		</div>
+	</div>	
+{% endblock body %}
+{% block script %}
+{{ block.super }}
+	<script>
+	var username_correct = false;
+	var password_correct = false;
+	var password_confirm = false;
+	var povisid_correct = true;
+	$(document).ready(function(){
+		$.ajaxSetup({
+			headers: {'X-CSRFToken': getCookie("csrftoken")}
+		});
+		$('input[role="username"]').watermark('Username (Used for login)');
+		$('input[role="password"]').watermark('Password');
+		$('input[role="passwordconfirm"]').watermark('Password Confirm');
+		$('[role="povisid"]').watermark("Povis ID(for mail and contact)").hide();
+		$('.glyphicon-ok').hide();
+		$('.glyphicon-remove').hide();
+		$('input[type="submit"]').hide();	
+
+		//form validation - client
+		//-------------------------------username
+		$('input[role="username"]').focusin(function(){
+			username_correct = false;
+		});
+		$('input[role="username"]').focusout(function(){
+			$.ajax({
+				type: 'POST',
+				url: '{% url "login:username_validation" %}',
+				data: {
+					username: $(this).val(),
+				},
+				success: function(data){
+					if(data.success){
+						username_correct = true;
+						$('input[role="username"]').parent().find('[role="message"]').text(data.message);
+						$('input[role="username"]').parent().find('.glyphicon-remove').hide();
+						$('input[role="username"]').parent().find('.glyphicon-ok').show();
+					}
+					else{
+						username_correct = false;
+						$('input[role="username"]').parent().find('[role="message"]').text(data.message);
+						$('input[role="username"]').parent().find('.glyphicon-ok').hide();
+						$('input[role="username"]').parent().find('.glyphicon-remove').show();
+					}
+				}
+			});
+		});
+		//------------------------------password
+		$('input[role="password"]').focusin(function(){
+			password_correct = false;
+		});
+		$('input[role="password"]').focusout(function(){
+			var password_rule=  /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{7,15}$/;
+			if($('input[role="password"]').val().match(password_rule)){
+				password_correct = true;
+				$('input[role="password"]').parent().find('[role="message"]').text('Good Password');
+				$('input[role="password"]').parent().find('.glyphicon-remove').hide();
+				$('input[role="password"]').parent().find('.glyphicon-ok').show();
+			}
+			else{
+				password_correct = false;
+				$('input[role="password"]').parent().find('[role="message"]').text('Should be between 7 to 15 characters which contain at least one numeric digit and a special character');
+				$('input[role="password"]').parent().find('.glyphicon-ok').hide();
+				$('input[role="password"]').parent().find('.glyphicon-remove').show();
+			}
+		});
+		$('input[role="passwordconfirm"]').focusin(function(){
+			password_confirm = false;
+		});
+		$('input[role="passwordconfirm"]').on('keyup', function(){
+			if($('input[role="password"]').val()==$(this).val()){
+				password_confirm = true;
+				$('input[role="passwordconfirm"]').parent().find('[role="message"]').text('Matched');
+				$('input[role="passwordconfirm"]').parent().find('.glyphicon-remove').hide();
+				$('input[role="passwordconfirm"]').parent().find('.glyphicon-ok').show();
+			}
+			else {
+				password_confirm = false;
+				$('input[role="passwordconfirm"]').parent().find('[role="message"]').text('Password does not match');
+				$('input[role="passwordconfirm"]').parent().find('.glyphicon-ok').hide();
+				$('input[role="passwordconfirm"]').parent().find('.glyphicon-remove').show();
+			}
+		});
+		//----------------------------povisid
+		$('input[role="officialmember"]').click(function(e){
+			if($(this).is(':checked')){
+				$('[role="povisid"]').slideDown();
+				if($('input[role="povisid"]').val().length == 0){
+					povisid_correct = false;
+				}
+			}
+			else{
+				$('[role="povisid"]').slideUp();
+				povisid_correct = true;
+			}
+		});
+		$('input[role="povisid"').on('keyup', function(){
+			if($(this).val().length > 0) povisid_correct = true;
+			else povisid_correct = false;
+		});
+
+		$(document).on('keyup click', function(){
+			if(username_correct && password_correct && password_confirm && povisid_correct){
+				$('input[type="submit"]').slideDown();	
+			}
+			else{
+				$('input[type="submit"]').slideUp();	
+			}
+		});
+		$(document).on('keydown', function(e){
+			var keyCode = e.keyCode || e.which;
+			if(keyCode == 13){
+				e.preventDefault();
+			}
+		});
+	});
+	</script>
+	<script src="{% static 'watermark3.1.4/jquery.watermark.min.js' %}"></script>
+	<script src="{% static 'indexvisualizer.js' %}"></script>
+{% endblock script %}

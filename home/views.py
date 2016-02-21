@@ -2,10 +2,17 @@ from django.shortcuts import render
 from django.views.generic.base import TemplateView
 from django.http import JsonResponse
 from posting.models import Post, Member
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 # Create your views here.
 class HomeView(TemplateView):
 	template_name = 'home/home.html'
+	def get(self, request):
+		if request.user.is_authenticated():
+			return super(HomeView, self).get(request)
+		else:
+			return HttpResponseRedirect(reverse('login:login'))
 
 	def post(self, request):
 		isscroll = request.POST['isscroll']
@@ -104,6 +111,14 @@ class HomeView(TemplateView):
 
 
 		return JsonResponse(result)
+class IndexView(TemplateView):
+	template_name  = 'home/index.html'
+
+	def get(self, request):
+		if request.user.is_authenticated():
+			return HttpResponseRedirect(reverse('home:home'))
+		else:
+			return super(IndexView, self).get(request)
 
 
 class AcademyView(TemplateView):

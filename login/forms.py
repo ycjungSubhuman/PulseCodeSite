@@ -11,7 +11,6 @@ class LoginForm(forms.ModelForm):
 			'password'
 		]
 	password = forms.CharField(widget=forms.PasswordInput)
-	remember_me = forms.BooleanField()
 
 	def __init__(self, *args, **kwargs):
 		super(LoginForm, self).__init__(*args, **kwargs)
@@ -22,7 +21,6 @@ class LoginForm(forms.ModelForm):
 		self.helper.layout = Layout(
 			Field('username', css_class="form-control", id="user_id"),
 			Field('password', css_class="form-control", id="user_pass"),
-			Field('remember_me', css_class="checkbox", id="rememberme"),
 			Submit('submit', "Login", id="submit"),
 		)
 		self.fields['username'].help_text=None

@@ -6,6 +6,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from login.forms import LoginForm 
 from django.http import JsonResponse
+from posting.models import Member
 
 #---Template views
 
@@ -21,6 +22,7 @@ class LoginFormView(FormView):
 		username = request.POST['username']
 		password = request.POST['password']
 		is_remember = request.POST.get('remember_me', None)
+		print is_remember
 
 		#json response
 		response = {
@@ -52,6 +54,34 @@ class LoginFormView(FormView):
 #---Function views
 def user_logout(request):
 	logout(request)
-	return HttpResponseRedirect(reverse('login:login'));
+	return HttpResponseRedirect(reverse('login:login'))
+
+def check_username(request):
+	username = request.POST['username']
+	result = {'success': False, 'message': ''}
+
+	# check for multiple value
+	if Member.objects.filter(user__username=username):
+		result['message'] = 'You cannot use this username'
+		return JsonResponse(result)
+	elif not format_username(username):
+		result['message'] = 'Username should be 4~30 characters. alphanumeric only.'
+		return JsonResponse(result)
+	else:
+		result['success']=True
+		result['message'] = ''
+		return JsonResponse(result)
+
+def format_username(username):
+	if len(username) < 4:
+		return False
+	elif len(username) >= 30:
+		return False
+	elif not username.isalnum():
+		return False
+	else:
+		return True
+
+
 
 
