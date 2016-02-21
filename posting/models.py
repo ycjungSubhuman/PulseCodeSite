@@ -18,8 +18,8 @@ class Tag(models.Model):
 
 class Creator(models.Model):
 	name = models.CharField(max_length=12)
-	salutation = models.CharField(max_length=140)
-	picture = models.ImageField(upload_to='uploads/userimage')
+	salutation = models.CharField(max_length=140, blank=True)
+	picture = models.ImageField(upload_to='uploads/userimage', default='default/user_default.png')
 	post_num = models.IntegerField(default=0)
 
 	def __unicode__(self):
@@ -51,7 +51,8 @@ class Track(Post):
 		help_text=u'트랙은 10MiB 미만으로 올려주세요.')
 
 	image = models.ImageField(upload_to='uploads/images/%Y/%m/%d', 
-		help_text=u'배경으로 쓰일 이미지입니다. 2MiB 미만의 이미지만 올려주세요.')
+		help_text=u'배경으로 쓰일 이미지입니다. 2MiB 미만의 이미지만 올려주세요.',
+		default='default/background_default.png')
 
 	description = models.CharField(max_length=140, 
 		help_text='트랙에 대한 간단한 설명을 써주세요.')
@@ -62,7 +63,8 @@ class Track(Post):
 
 class Journal(Post):
 	body = models.TextField()
-	bgimage = models.ImageField(upload_to='uploads/bgimage/%Y/%m/%d/')
+	bgimage = models.ImageField(upload_to='uploads/bgimage/%Y/%m/%d/',
+		default='default/background_default.png')
 
 	def __unicode__(self):
 		return self.title

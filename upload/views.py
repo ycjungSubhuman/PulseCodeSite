@@ -49,7 +49,7 @@ class TrackUploadFormView(FormView):
 		track.audio_file = self.request.FILES['audio_file']
 
 		# - image
-		track.image = self.request.FILES['image']
+		track.image = form.cleaned_data['image']
 
 		# - description
 		track.description = form.cleaned_data['description']

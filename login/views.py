@@ -1,12 +1,16 @@
 from django.shortcuts import render
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.models import User 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from login.forms import LoginForm 
+from login.forms import LoginForm, MemberForm
 from django.http import JsonResponse
 from posting.models import Member
+from ipware.ip import get_ip
+import logging
+logger = logging.getLogger('login')
 
 #---Template views
 
@@ -49,7 +53,23 @@ class LoginFormView(FormView):
 		else:
 		#login fail - not matched
 			response['message']='Username or Password is not matched'
+			logger.warning('a login fail - '+username+'/'+get_ip(request))
 			return JsonResponse(response)
+
+class UserSetupView(FormView):
+	form_class = MemberForm
+	template_name = 'login/setup.html'
+
+	def form_valid(self, form):
+		member = Member()
+		member.name = form.cleaned_data['name']
+		member.salutation = form.cleaned_data['salutation']
+		member.picture = form.cleaned_data['picture']
+		member.save()
+
+		return HttpResponseRedirect(reverse('home:home'))
+
+
 
 #---Function views
 def user_logout(request):
@@ -61,7 +81,7 @@ def check_username(request):
 	result = {'success': False, 'message': ''}
 
 	# check for multiple value
-	if Member.objects.filter(user__username=username):
+	if User.objects.filter(username=username):
 		result['message'] = 'You cannot use this username'
 		return JsonResponse(result)
 	elif not format_username(username):
@@ -82,6 +102,21 @@ def format_username(username):
 	else:
 		return True
 
+def signup(request):
+	if request.method == 'POST':
+		username = request.POST['username']
+		password = request.POST['password']
+		official = request.POST.get('official', False)
+		povisid = request.POST['povisid']
 
+		user = User.objects.create_user(username)
+		user.set_password(password)
+		if official:
+			user.email = povisid +'@postech.ac.kr'
 
+		user.save()
+		authuser = authenticate(username=username, password=password)
+		login(request, authuser)
+		logger.info('A user signed up! --- '+username+'/'+get_ip(request))
+	return HttpResponseRedirect(reverse('login:setup'))
 

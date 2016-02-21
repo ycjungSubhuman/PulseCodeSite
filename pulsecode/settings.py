@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'posting',
     'markdown',
     'audiotools',
+    'ipware',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -162,7 +163,7 @@ LOGGING = {
 		},
 	},
 	'loggers': {
-		'testpoll': {
+		'login': {
 			'handlers': ['file'],
 			'level': 'DEBUG',
 		},

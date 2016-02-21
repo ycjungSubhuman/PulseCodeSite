@@ -22,6 +22,12 @@
 	.btn-default:hover {
 		border: solid 1px #ffffff;
 	}
+	.signin {
+		font-size: 12pt;
+		font-family: sans-serif;
+		margin: 5px;
+		margin-left: 0px;
+	}
 </style>
 
 {% endblock style %}
@@ -40,7 +46,7 @@
 				</ul>
 			</div>
 			<div class="col-xs-12 col-sm-6 col-lg-6">
-				<form method="post" role="form" id="signup_form">
+				<form method="post" role="form" id="signup_form" action="{% url 'login:signup' %}">
 					<div class="panel panel-default panel-signup">
 						<div class="penel-body">
 							<h3>부담 없이 가입하세요</h3>
@@ -72,6 +78,7 @@
 								<input class="form-control form-text" name="povisid" type="text" role="povisid"/>
 							</div>
 							<input class="btn btn-default" type="submit" />
+							<span>If you are a member, </span><a class="signin" href="{% url 'login:login' %}">Sign in</a>
 						</div>
 					</div>
 				</form>
@@ -124,11 +131,12 @@
 						$('input[role="username"]').parent().find('.glyphicon-ok').hide();
 						$('input[role="username"]').parent().find('.glyphicon-remove').show();
 					}
+					showSubmit();
 				}
 			});
 		});
 		//------------------------------password
-		$('input[role="password"]').on('focusin focusout', function(){
+		$('input[role="password"]').on('keyup focusin focusout', function(){
 			var password_rule=  /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{7,15}$/;
 			if($('input[role="password"]').val().match(password_rule)){
 				password_correct = true;
@@ -142,6 +150,8 @@
 				$('input[role="password"]').parent().find('.glyphicon-ok').hide();
 				$('input[role="password"]').parent().find('.glyphicon-remove').show();
 			}
+			$('input[role="passwordconfirm"]').trigger('focusout');
+			showSubmit();
 		});
 		$('input[role="passwordconfirm"]').on('focusin keyup focusout', function(){
 			if($('input[role="password"]').val()==$(this).val()){
@@ -156,6 +166,7 @@
 				$('input[role="passwordconfirm"]').parent().find('.glyphicon-ok').hide();
 				$('input[role="passwordconfirm"]').parent().find('.glyphicon-remove').show();
 			}
+			showSubmit();
 		});
 		//----------------------------povisid
 		$('input[role="officialmember"]').click(function(e){
@@ -169,20 +180,22 @@
 				$('[role="povisid"]').slideUp();
 				povisid_correct = true;
 			}
+			showSubmit();
 		});
-		$('input[role="povisid"').on('keyup', function(){
+		$('input[role="povisid"]').on('keyup', function(){
 			if($(this).val().length > 0) povisid_correct = true;
 			else povisid_correct = false;
+			showSubmit();
 		});
 
-		$(document).on('keyup click', function(){
+		function showSubmit(){
 			if(username_correct && password_correct && password_confirm && povisid_correct){
-				$('input[type="submit"]').slideDown();	
+				$('input[type="submit"]').show();	
 			}
 			else{
-				$('input[type="submit"]').slideUp();	
+				$('input[type="submit"]').hide();	
 			}
-		});
+		}
 		$(document).on('keydown', function(e){
 			var keyCode = e.keyCode || e.which;
 			if(keyCode == 13){
