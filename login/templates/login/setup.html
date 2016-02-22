@@ -14,7 +14,11 @@
 	.imagepreview {
 		width: 100px;
 		height: 100px;
+		{% if not picture %}
 		background-image: url("/media/defaults/user_default.png");
+		{% else %}
+		background-image: url("{{ picture }}");
+		{% endif %}
 		background-position: center center;
 		background-repeat: no-repeat;
 		background-size: 100%;
@@ -64,9 +68,6 @@
 {{ block.super }}
 	<script>
 	$(document).ready(function(){
-		{% if not username %}
-			$('header').remove();
-		{% endif %}
 
 		//bgimage preview
 		$('[role="picture"]').change(function(e){

@@ -443,6 +443,7 @@
 				commentstart.val(0);
 				$(this).parents('[role="entity"]').find('[role="commentlist"]').empty();
 			}
+			$(window).trigger('page:appended');
 
 		});
 		// auto adjust the height of comment text
@@ -470,6 +471,7 @@
 			updateComment(this);
 			$('[role="commentstartfrom"]').val(Number($('[role="commentstartfrom"]').val())+3);
 			$(this).parent().hide();
+			$(window).trigger('page:appended');
 		})
 
 	});	

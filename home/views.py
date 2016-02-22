@@ -8,6 +8,20 @@ from django.core.urlresolvers import reverse
 # Create your views here.
 class HomeView(TemplateView):
 	template_name = 'home/home.html'
+
+	def get_context_data(self):
+		context = super(HomeView, self).get_context_data()
+		if not self.request.user.is_authenticated():
+			return context
+		else:
+			try:
+				member = Member.objects.get(user=self.request.user)
+				context['name'] = member.name
+				context['picture'] = member.picture.url
+				return context
+			except Member.DoesNotExist:
+				return context
+
 	def get(self, request):
 		if not request.user.is_authenticated():
 			return HttpResponseRedirect(reverse('login:login'))

@@ -61,6 +61,26 @@ class UserSetupView(FormView):
 	form_class = MemberForm
 	template_name = 'login/setup.html'
 
+	def get_context_data(self):
+		context = super(UserSetupView, self).get_context_data()
+		if not self.request.user.is_authenticated():
+			return context
+		else:
+			try:
+				member = Member.objects.get(user=self.request.user)
+				context['name'] = member.name
+				context['picture'] = member.picture.url
+				return context
+			except Member.DoesNotExist:
+				return context
+	def get_form(self, form_class):
+		try:
+			member = Member.objects.get(user=self.request.user)
+			return form_class(instance=member, **self.get_form_kwargs())
+		except Member.DoesNotExist:
+			return form_class(**self.get_form_kwargs())
+
+
 	def get(self, request):
 		if not request.user.is_authenticated():
 			return HttpResponseRedirect(reverse('login:login'))
@@ -68,15 +88,8 @@ class UserSetupView(FormView):
 			return super(UserSetupView, self).get(request)
 
 	def form_valid(self, form):
-		member = Member()
-		member.name = form.cleaned_data['name']
-		member.salutation = form.cleaned_data['salutation']
-		if form.cleaned_data['picture']:
-			member.picture = form.cleaned_data['picture']
-		member.user = self.request.user
-
-		member.save()
-
+		form.instance.user = self.request.user
+		form.save()
 		return HttpResponseRedirect(reverse('home:home'))
 
 

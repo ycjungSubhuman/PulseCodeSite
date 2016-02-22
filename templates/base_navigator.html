@@ -9,12 +9,25 @@
 		padding-bottom: 52px;
 		height: 1800px;
 	}
+	.profilespan {
+		width: 20px;
+		height: 20px;
+		margin-right: 5px;
+	}
+	[role="profilepic"]{
+		border-radius: 50%;
+		width: 20px;
+		height: auto;
+	}
 	@media all and (min-width:768px){
 		.content {
 			margin-left: auto;
 			margin-right: auto;
 			border: solid 1px #333333;
 		}
+	}
+	.navbar-right {
+		margin-right: 10px;
 	}
 	</style>
 {% endblock style %}
@@ -46,9 +59,10 @@
 						</ul>
 					</li>
 					<li class="dropdown">
-						<a class="dropdown-toggle btn btn-sm" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> User &nbsp</a>
+						<a class="dropdown-toggle btn btn-sm" data-toggle="dropdown"><span class="profilespan"><img src="{{ picture }}" role="profilepic"/></span> {{ name }}</a>
 						<ul class="dropdown-menu">
 							<li><a href="#">Profile</a></li>
+							<li><a href="{% url 'login:setup' %}">Config</a></li>
 							<li><a href="{% url 'login:logout' %}">Logout</a></li>
 						</ul>
 					</li>
@@ -63,6 +77,11 @@
 {% block script %}
 {{ block.super }}
 <script>
+	$(document).ready(function(){
+		{% if not name %}
+			$('header').remove();
+		{% endif %}
+	})
 
 </script>
 {% endblock script %}

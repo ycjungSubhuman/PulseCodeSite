@@ -305,8 +305,10 @@
 }
 
 [role="commentauthorpic"] {
+	background-color: #111111;
 	background-position: center center;
 	background-size: 100%;
+	background-repeat: no-repeat;
 	border-radius: 50%;
 	height: 30px;
 	width: 30px;
