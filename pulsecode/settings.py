@@ -19,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY WARNING: keep the secret key used in production secret!one-off default
 SECRET_KEY = 'v=-wr+k3!0-)e7@1y+t9a%tpytd&p8dy0fe9(=0&#zrkbkgeja'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -41,9 +41,9 @@ INSTALLED_APPS = [
 	'login',
     'upload',
     'home',
-    'achievement',
     'posting',
-    'markdown',
+    'journal',
+    'track',
     'audiotools',
     'ipware',
 ]

@@ -78,7 +78,7 @@ class TrackUploadFormView(FormView):
 class JournalWriteView(FormView):
 	template_name = 'upload/write.html'
 	form_class = JournalForm
-
+	
 	def get_context_data(self):
 		context = super(JournalWriteView, self).get_context_data()
 		if not self.request.user.is_authenticated():

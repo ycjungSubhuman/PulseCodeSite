@@ -28,7 +28,8 @@ urlpatterns = [
     url(r'^logout/', user_logout, name='logout'),
     url(r'^home/', include('home.urls', namespace='home')),
     url(r'^posting/', include('posting.urls', namespace='posting')),
-#url(r'^register/', include('register.urls', namespace='register')),
-
+    
+    url(r'^journal/', include('journal.urls', namespace='journal')),
+    url(r'^track/', include('track.urls', namespace='track')),
 ]
 

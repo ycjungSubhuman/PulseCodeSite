@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from pulsecode import settings
 from django.utils.html import format_html
 import os
+import datetime
 
 
 class Tag(models.Model):
@@ -40,6 +41,7 @@ class Post(models.Model):
 	tag = models.ManyToManyField(Tag)
 	liked_member = models.ManyToManyField(Member, related_name='liked_post', blank=True)
 	scraped_member = models.ManyToManyField(Member, related_name='scraped_post', blank=True)
+	datetime = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
 		return self.title
@@ -56,7 +58,6 @@ class Track(Post):
 
 	description = models.CharField(max_length=140, 
 		help_text='트랙에 대한 간단한 설명을 써주세요.')
-	datetime = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
 		return self.title
@@ -72,6 +73,7 @@ class Comment(models.Model):
 	author = models.ForeignKey(Member)
 	post = models.ForeignKey(Post, related_name='comment', on_delete=models.CASCADE)
 	text = models.CharField(max_length=140)
+	datetime = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
 		return self.text
