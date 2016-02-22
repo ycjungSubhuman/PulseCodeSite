@@ -31,12 +31,12 @@
 				<a class="navbar-brand" href="{% url 'home:home' %}">Pulsecode</a></li>
 			</div>
 			<div class="collapse navbar-collapse" id="menu">
-				<ul class="nav navbar-nav">
+				<ul class="nav navbar-nav" id="common">
 					<li><a href="{% url 'home:academy' %}">Academy</a></li>
 					<li><a href="{% url 'home:tune' %}">Tune</a></li>
 					<li><a href="{% url 'home:journal' %}">Journal</a></li>
 				</ul>
-				<ul class="nav navbar-nav navbar-right">
+				<ul class="nav navbar-nav navbar-right" id="user_specific">
 					<li class="dropdown">
 						<a class="dropdown-toggle btn btn-sm" data-toggle="dropdown"><span class="glyphicon glyphicon-circle-arrow-up"></span> Write<span class="caret"></span></a>
 						<ul class="dropdown-menu">
@@ -61,6 +61,7 @@
 {% endblock body %}
 
 {% block script %}
+{{ block.super }}
 <script>
 
 </script>

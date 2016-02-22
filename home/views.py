@@ -9,10 +9,13 @@ from django.core.urlresolvers import reverse
 class HomeView(TemplateView):
 	template_name = 'home/home.html'
 	def get(self, request):
-		if request.user.is_authenticated():
-			return super(HomeView, self).get(request)
-		else:
+		if not request.user.is_authenticated():
 			return HttpResponseRedirect(reverse('login:login'))
+		else:
+			if not Member.objects.filter(user=request.user):
+				return HttpResponseRedirect(reverse('login:setup'))
+			else:
+				return super(HomeView, self).get(request)
 
 	def post(self, request):
 		isscroll = request.POST['isscroll']

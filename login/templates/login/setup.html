@@ -1,2 +1,88 @@
-{% extends "base.html" %}
+{% extends "base_navigator.html" %}
+{% block style %}
+{{ block.super }}
+<style>
+	.memberconfig {
+		display: block;
+		margin: auto;
+		margin-top: 52px;
+		max-width: 700px;
+	}
+	input[type="submit"]{
+		margin-top: 20px;
+	}
+	.imagepreview {
+		width: 100px;
+		height: 100px;
+		background-image: url("/media/defaults/user_default.png");
+		background-position: center center;
+		background-repeat: no-repeat;
+		background-size: 100%;
+		float: left;
+		margin: 10px;
+		margin-left: 0px;
+	}
 
+</style>
+{% endblock style %}
+
+{% block content %}
+		<div class="panel panel-default memberconfig">
+			<div class="panel-heading">Member Profile Config</div>
+			<div class="panel-body">
+				<form method="post" role="form" action="{% url 'login:setup' %}" enctype="multipart/form-data">
+					{% csrf_token %}
+					{% load myfilters %}
+					<div class="form-group">
+						<label for="{{ form.name.id_for_label }}">Name: </label>
+						{{ form.name.errors }}
+						{{ form.name|addclass_role:"form-control" }}
+					</div>
+
+					<div class="form-group">
+						<label for="{{ form.salutation.id_for_label }}">Salutation: </label>
+						{{ form.salutation.erors }}
+						{{ form.salutation|addclass_role:"form-control,salutation"}}
+					</div>
+
+					<div class="form-gruop">
+						<div class="imagepreview"></div>
+						<label for="{{ form.picture.id_for_label">Your Icon: </label>
+						{{ form.picture.errors }}
+						{{ form.picture|addclass_role:"file,picture" }}
+					</div>
+
+					<div class="form-group">
+						<input type="submit" class="btn btn-default form-control" />
+					</div>
+				</form>
+			</div>
+		</div>
+{% endblock content %}
+
+{% block script %}
+{{ block.super }}
+	<script>
+	$(document).ready(function(){
+		{% if not username %}
+			$('header').remove();
+		{% endif %}
+
+		//bgimage preview
+		$('[role="picture"]').change(function(e){
+			readURL(this);
+		});
+		function readURL(input) {
+		    if (input.files && input.files[0]) {
+		        var reader = new FileReader();
+
+		        reader.onload = function (e) {
+		            $('.imagepreview').css('background-image', 'url('+e.target.result+')');
+		        }
+
+		        reader.readAsDataURL(input.files[0]);
+		    }
+		}
+	});
+	</script>
+{% endblock script %}

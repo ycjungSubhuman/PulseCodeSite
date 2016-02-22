@@ -18,8 +18,8 @@ class Tag(models.Model):
 
 class Creator(models.Model):
 	name = models.CharField(max_length=12)
-	salutation = models.CharField(max_length=140, blank=True)
-	picture = models.ImageField(upload_to='uploads/userimage', default='default/user_default.png')
+	salutation = models.CharField(max_length=300, blank=True)
+	picture = models.ImageField(upload_to='uploads/userimage', default='/media/defaults/user_default.png')
 	post_num = models.IntegerField(default=0)
 
 	def __unicode__(self):

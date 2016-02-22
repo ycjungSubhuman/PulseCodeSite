@@ -34,13 +34,21 @@ class MemberForm(forms.ModelForm):
 			'salutation',
 			'picture',
 		]
+	error_messages = {
+		'image_exceed': 'Image Exceeds 2MiB.'
+	}
 
 	def clean_picture(self):
 		try:
 			size_image = self.cleaned_data['picture'].size
-			if size_image > 2*1024*1024: # 2MiB
-				raise ValidationError(self.error_messages['image_exceed'])
-			return self.cleaned_data['bgimage']
 		except:
-			return ''
-			
+			return
+		print 'wow passed'
+		if size_image > 2*1024*1024: # 2MiB
+			raise ValidationError(self.error_messages['image_exceed'])
+		return self.cleaned_data['picture']
+
+	def __init__(self, *args, **kwargs):
+		super(MemberForm, self).__init__(*args, **kwargs)
+
+		self.fields['salutation'].widget = forms.Textarea(attrs={'maxlength':300})

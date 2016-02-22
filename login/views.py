@@ -8,8 +8,9 @@ from django.views.generic.edit import FormView
 from login.forms import LoginForm, MemberForm
 from django.http import JsonResponse
 from posting.models import Member
-from ipware.ip import get_ip
+from ipware.ip import get_ip, get_real_ip
 import logging
+
 logger = logging.getLogger('login')
 
 #---Template views
@@ -60,11 +61,20 @@ class UserSetupView(FormView):
 	form_class = MemberForm
 	template_name = 'login/setup.html'
 
+	def get(self, request):
+		if not request.user.is_authenticated():
+			return HttpResponseRedirect(reverse('login:login'))
+		else:
+			return super(UserSetupView, self).get(request)
+
 	def form_valid(self, form):
 		member = Member()
 		member.name = form.cleaned_data['name']
 		member.salutation = form.cleaned_data['salutation']
-		member.picture = form.cleaned_data['picture']
+		if form.cleaned_data['picture']:
+			member.picture = form.cleaned_data['picture']
+		member.user = self.request.user
+
 		member.save()
 
 		return HttpResponseRedirect(reverse('home:home'))
@@ -117,6 +127,6 @@ def signup(request):
 		user.save()
 		authuser = authenticate(username=username, password=password)
 		login(request, authuser)
-		logger.info('A user signed up! --- '+username+'/'+get_ip(request))
+		logger.info('A user signed up! --- '+username+'|'+povisid+'/'+get_ip(request))
 	return HttpResponseRedirect(reverse('login:setup'))
 
